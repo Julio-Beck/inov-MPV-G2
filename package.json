@@ -1,0 +1,14 @@
+{
+  "name": "oportuniza-rede",
+  "version": "1.0.0",
+  "description": "MVP de demonstração da Oportuniza Rede: rede de carreiras para estudantes, empresas e instituições.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test tests/domain.test.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
