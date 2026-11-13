@@ -1,7 +1,9 @@
 # Oportuniza Rede — MVP
 
-Rede de carreiras que conecta **estudantes**, **empresas** e **instituições de ensino**.
-É uma demonstração interativa: todas as pessoas, empresas e vagas são fictícias, e os dados ficam salvos só no navegador de quem está usando.
+A central de carreiras e estágios das faculdades, conectada a uma rede nacional de empresas.
+A **faculdade** adota (portal com a sua marca, termos de estágio digitais e indicadores de empregabilidade), a **empresa** paga por estagiário ativo e o **aluno** usa de graça.
+
+É uma demonstração interativa: faculdades, empresas e pessoas são fictícias, assinaturas são simuladas e os dados ficam salvos só no navegador.
 
 ## Como rodar no seu computador
 
@@ -45,15 +47,16 @@ Depois abra <http://localhost:4173>. Para parar o servidor, use `Ctrl + C` (ou f
 
 Se a porta 4173 já estiver ocupada, escolha outra (exemplo no Windows: `set PORT=4174 && npm start`).
 
-## Roteiro de teste (5 minutos)
+## Roteiro de demonstração (3 minutos)
 
-1. **Aluno:** busque "design", abra *Estágio em UI/UX Design*, salve e candidate-se. Tente se candidatar de novo: não deixa.
-2. **Empresa:** em *Minhas vagas → Publicar vaga*, crie um estágio só para a Vale do Recanto. Tente 40 horas ou deixe sem supervisor: o formulário recusa.
-3. **Aluno:** encontre a nova vaga e candidate-se. Troque a instituição no topo para *Horizonte*: a vaga não aparece lá.
-4. **Instituição:** em *Talentos*, indique um estudante para a vaga. Em *Portal*, mude o nome e a cor.
-5. **Empresa:** em *Candidatos*, a indicação aparece no cartão. Avance até *Contratado*.
-6. **Instituição:** em *Estágios*, acompanhe o termo e o relatório (simulados).
-7. Recarregue a página: tudo continua salvo. Em *Ajuda*, dá para restaurar os dados de exemplo.
+1. **Faculdade:** abre no painel da Vale Verde. Veja as pendências e assine o termo que está esperando; cobre o relatório atrasado; exporte o relatório de empregabilidade (CSV).
+2. **Empresa:** publique um estágio para toda a rede. Tente 40 horas: a Lei do Estágio não deixa.
+3. **Aluno (Lucas, Sistemas de Informação, 3º semestre, aula à noite):** só aparecem vagas compatíveis com curso, semestre e horário. Candidate-se à vaga nova.
+4. **Empresa:** em Candidatos, avance o Lucas até “Contratar e gerar termo”.
+5. **Aluno:** em Meu estágio, assine o termo.
+6. **Faculdade:** assine nas pendências. “Estagiando agora” sobe e a fatura da empresa aumenta R$ 40.
+
+Troque a faculdade no topo para ver outro portal (a Serra Azul está no plano gratuito). Em *Roteiro e ajuda* dá para restaurar os dados de exemplo.
 
 ## Estrutura
 
@@ -75,5 +78,6 @@ npm test
 
 ## Observação sobre a recuperação
 
-O MVP original foi recuperado de um backup em que faltavam `dist/app.js`, `dist/styles.css` e `tests/domain.test.mjs`.
-Esses três arquivos foram reconstruídos a partir da especificação em `specs/001-oportuniza-rede/`. O `dist/domain.mjs` original foi mantido e ganhou as operações que a especificação pedia (salvar vagas, encerrar/reabrir, editar perfil, personalizar o portal e acompanhar estágios).
+A primeira versão foi recuperada de um backup incompleto e reconstruída a partir de `specs/001-oportuniza-rede/`.
+A versão atual (v2) reflete o novo modelo de negócio: rede nacional de faculdades, termo de estágio tripartite, relatórios semestrais, indicadores para a faculdade e cobrança por estagiário ativo.
+A análise de mercado e os materiais do pitch ficam em `docs/`.

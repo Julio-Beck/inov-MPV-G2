@@ -322,3 +322,55 @@ dialog::backdrop { background: rgb(22 32 27 / .45); backdrop-filter: blur(2px); 
 .toast.error { background: var(--danger); }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
+
+/* ---------- v2: rede de faculdades ---------- */
+.metric small { color: var(--muted); font-size: .8rem; }
+.metric.accent { background: var(--accent-soft); border-color: var(--accent-line); }
+.chip.warn { background: #fbf1dc; color: #8a5f12; }
+.chip.bad { background: #fbe4df; color: #a23b2c; }
+.chip.info { background: #e6eef8; color: #3d5f8f; }
+.bad-text { color: var(--danger); }
+.small svg, .pend svg, .ok-line svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; vertical-align: -3px; flex: none; }
+.pend-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+.pend { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: #fff; flex-wrap: wrap; }
+.pend > span { min-width: 0; overflow-wrap: anywhere; font-size: .92rem; }
+.pend > svg { color: var(--accent); }
+.sigs { list-style: none; margin: 0; padding: 0; display: flex; gap: 6px; flex-wrap: wrap; }
+.sigs li { display: inline-flex; align-items: center; gap: 4px; font-size: .78rem; padding: 3px 9px; border-radius: 999px; background: #fbf1dc; color: #8a5f12; }
+.sigs li.on { background: #e3f0e5; color: var(--ok); }
+.sigs svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.4; }
+.intern { display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 900px) { .intern { grid-template-columns: minmax(0, 1fr) minmax(0, 360px); align-items: start; } }
+.intern-main { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.intern-meta { display: flex; flex-direction: column; gap: 4px; }
+.intern-side { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+.intern h3 { margin: 0; font-size: 1.05rem; }
+.bars.wide li { grid-template-columns: minmax(0, 150px) minmax(0, 1fr) 40px 40px; }
+.bars.wide span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.people-list { padding: 4px 16px; }
+.people-list li + li { border-top: 1px solid var(--line); }
+.people-list .row { flex-wrap: wrap; }
+.plans { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); }
+.plan { display: flex; flex-direction: column; gap: 10px; }
+.plan.current { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.plan h3 { margin: 0; }
+.plan-price { font-family: var(--serif); font-size: 1.4rem; margin: 0; }
+.plan-price small { display: block; font-family: var(--sans); font-size: .82rem; color: var(--muted); margin-top: 4px; }
+.plan .btn { align-self: flex-start; margin-top: auto; }
+.bill-total { font-family: var(--serif); font-size: 2.4rem; color: var(--accent); margin: 4px 0; }
+.why { margin: 0; font-size: .82rem; color: #8a5f12; }
+.job-card.dim { opacity: .82; }
+.callout.ok { background: #e3f0e5; border-color: #bcd9c3; color: var(--ok); }
+.callout.ok svg { fill: none; stroke: currentColor; stroke-width: 2.4; }
+.callout.warn svg { fill: none; stroke: currentColor; stroke-width: 2; }
+.filter-check { align-self: center; }
+.filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 900px) { .filters { grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr)) auto; } }
+.filters .filter-check { grid-column: 1 / -1; }
+@media (min-width: 900px) { .filters .filter-check { grid-column: auto; } }
+.cand-termo { margin: 0; }
+.toolbar .check { flex: 0 0 auto; }
+.btn svg { width: 17px; height: 17px; }
+.pend { display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; align-items: center; column-gap: 10px; row-gap: 8px; }
+.pend > .btn { justify-self: end; }
+@media (max-width: 600px) { .pend { grid-template-columns: 18px minmax(0, 1fr); } .pend > .btn { grid-column: 2; justify-self: start; } }

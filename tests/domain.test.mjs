@@ -2,107 +2,109 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as D from '../dist/domain.mjs';
 
-const valid = (over = {}) => ({ title: 'Estágio em Design', description: 'Descrição da vaga.', course: 'Design', type: 'Estágio', mode: 'Híbrido', shift: 'Tarde', location: 'Santa Maria, RS', salary: 1500, hours: 30, supervisor: 'Ana', institutionIds: ['i1'], ...over });
+const NOW = '2026-11-13';
+const valid = (over = {}) => ({ title: 'Estágio em Mobile', description: 'Descrição.', course: 'Sistemas de Informação', type: 'Estágio', mode: 'Remoto', shift: 'Tarde', salary: 1500, hours: 30, minSemester: 2, supervisor: 'Ana', institutionIds: ['i1'], ...over });
 
-test('dados iniciais respeitam o escopo de cada instituição', () => {
-  const s = D.seed();
-  assert.equal(D.studentFor(s, 'i1').id, 's1');
-  assert.equal(D.studentFor(s, 'i3').id, 's5');
-  assert.equal(D.visibleJobs(s, 'i1').length, 6);
-  assert.ok(D.visibleJobs(s, 'i3').every(j => j.institutionIds.includes('i3')));
-  assert.ok(!D.visibleJobs(s, 'i3').some(j => j.id === 'j4'));
+test('dados de exemplo: rede com 3 faculdades, escopo por faculdade', () => {
+  const s = D.seed(NOW);
+  assert.equal(s.institutions.length, 3);
+  assert.equal(D.studentsOf(s, 'i1').length, 70);
+  assert.equal(D.studentFor(s, 'i1').name, 'Lucas Ferreira');
+  assert.ok(D.visibleJobs(s, 'i2').every(j => j.institutionIds.includes('i2')));
+  assert.deepEqual(D.seed(NOW).students.map(x => x.name), s.students.map(x => x.name), 'geração determinística');
 });
 
-test('candidatura é registrada uma única vez', () => {
-  const s = D.seed();
-  const a = D.apply(s, 'j1', 's1');
-  assert.equal(a.stage, 'Inscrito');
+test('compatibilidade considera curso, semestre e horário de aula', () => {
+  const s = D.seed(NOW), lucas = D.studentFor(s, 'i1');
+  const byId = Object.fromEntries(D.jobsForStudent(s, lucas).map(x => [x.job.id, x]));
+  assert.equal(byId.j1.compatible, true);
+  assert.equal(byId.j11.semester, false);
+  assert.equal(byId.j3.course, false);
+});
+
+test('candidatura única e só para vagas da própria faculdade', () => {
+  const s = D.seed(NOW);
+  D.apply(s, 'j1', 's1');
   assert.throws(() => D.apply(s, 'j1', 's1'), /já se candidatou/);
-  assert.equal(s.applications.filter(x => x.vacancyId === 'j1' && x.studentId === 's1').length, 1);
+  assert.throws(() => D.apply(s, 'j4', 's1'), /não está disponível/);
 });
 
-test('aluno não se candidata a vaga fora da sua instituição ou encerrada', () => {
-  const s = D.seed();
-  assert.throws(() => D.apply(s, 'j4', 's5'), /não está disponível/);
-  D.setVacancyStatus(s, 'j1', 'closed');
-  assert.throws(() => D.apply(s, 'j1', 's1'), /não está disponível/);
-  assert.ok(!D.visibleJobs(s, 'i1').some(j => j.id === 'j1'));
-  D.setVacancyStatus(s, 'j1', 'open');
-  assert.ok(D.visibleJobs(s, 'i1').some(j => j.id === 'j1'));
-});
-
-test('publicação valida estágio, carga horária e público', () => {
-  const s = D.seed();
-  assert.throws(() => D.publish(s, valid({ hours: 40 })), /supervisor e carga entre 1 e 30/);
-  assert.throws(() => D.publish(s, valid({ supervisor: ' ' })), /supervisor/);
-  assert.throws(() => D.publish(s, valid({ institutionIds: [] })), /ao menos uma instituição/);
-  assert.throws(() => D.publish(s, valid({ title: '' })), /título/);
-  assert.throws(() => D.publish(s, valid({ salary: 0 })), /remuneração/);
-  assert.throws(() => D.publish(s, valid({ type: 'Primeiro emprego', hours: 45, supervisor: '' })), /entre 1 e 44/);
+test('publicação respeita a Lei do Estágio', () => {
+  const s = D.seed(NOW);
+  assert.throws(() => D.publish(s, valid({ hours: 40 })), /30 horas/);
+  assert.throws(() => D.publish(s, valid({ supervisor: '' })), /supervisor/);
+  assert.throws(() => D.publish(s, valid({ institutionIds: [] })), /ao menos uma faculdade/);
+  assert.throws(() => D.publish(s, valid({ minSemester: 0 })), /semestre/);
   const j = D.publish(s, valid());
-  assert.equal(j.companyId, D.companyId);
   assert.ok(D.visibleJobs(s, 'i1').some(x => x.id === j.id));
   assert.ok(!D.visibleJobs(s, 'i2').some(x => x.id === j.id));
   assert.ok(D.publish(s, valid({ type: 'Primeiro emprego', hours: 40, supervisor: '' })));
 });
 
-test('empresa move apenas candidaturas das próprias vagas', () => {
-  const s = D.seed();
-  D.moveApplication(s, 'a1', 'Contratado');
-  assert.equal(s.applications.find(a => a.id === 'a1').stage, 'Contratado');
-  assert.throws(() => D.moveApplication(s, 'a4', 'Entrevista'), /inválida/);
-  assert.throws(() => D.moveApplication(s, 'a1', 'Outra'), /inválida/);
-  assert.throws(() => D.setVacancyStatus(s, 'j2', 'closed'), /inválida/);
+test('contratar gera termo tripartite; três assinaturas ativam o estágio', () => {
+  const s = D.seed(NOW);
+  const a = D.apply(s, 'j1', 's1');
+  for (const st of ['Em análise', 'Entrevista', 'Contratado']) D.moveApplication(s, a.id, st, NOW);
+  const it = s.internships.find(x => x.applicationId === a.id);
+  assert.equal(D.internshipStatus(it, NOW), 'Aguardando assinaturas');
+  assert.ok(it.signatures.empresa);
+  const before = D.institutionMetrics(s, 'i1', NOW).interning;
+  D.signInternship(s, it.id, 'aluno', NOW);
+  assert.throws(() => D.signInternship(s, it.id, 'aluno', NOW), /já foi assinado/);
+  D.signInternship(s, it.id, 'faculdade', NOW);
+  assert.equal(D.internshipStatus(it, NOW), 'Ativo');
+  assert.equal(D.institutionMetrics(s, 'i1', NOW).interning, before + 1);
+  assert.throws(() => D.moveApplication(s, a.id, 'Entrevista', NOW), /já está assinado/);
 });
 
-test('indicação exige aluno da instituição e não duplica', () => {
-  const s = D.seed();
-  D.recommend(s, 's1', 'j1', 'i1');
-  D.recommend(s, 's1', 'j1', 'i1');
-  assert.equal(s.recommendations.length, 1);
-  assert.throws(() => D.recommend(s, 's4', 'j1', 'i1'), /aluno e uma vaga/);
-  assert.throws(() => D.recommend(s, 's5', 'j4', 'i3'), /aluno e uma vaga/);
+test('voltar a etapa antes das assinaturas cancela o termo', () => {
+  const s = D.seed(NOW);
+  const a = D.apply(s, 'j1', 's1');
+  D.moveApplication(s, a.id, 'Contratado', NOW);
+  D.moveApplication(s, a.id, 'Entrevista', NOW);
+  assert.ok(!s.internships.some(x => x.applicationId === a.id));
 });
 
-test('vagas salvas alternam sem duplicar', () => {
-  const s = D.seed();
-  assert.equal(D.toggleSaved(s, 'j2', 's1'), true);
-  assert.ok(D.isSaved(s, 'j2', 's1'));
-  assert.equal(D.toggleSaved(s, 'j2', 's1'), false);
-  assert.equal(s.saved.length, 0);
-  assert.throws(() => D.toggleSaved(s, 'j4', 's5'), /não está disponível/);
+test('relatórios: atrasado, entregue, aprovado e próximo agendado', () => {
+  const s = D.seed(NOW);
+  const m = D.institutionMetrics(s, 'i1', NOW);
+  assert.ok(m.pending.signatures.length >= 1 && m.pending.overdue.length >= 1 && m.pending.toApprove.length >= 1);
+  const late = m.pending.overdue.at(0);
+  assert.equal(D.internshipStatus(late, NOW), 'Relatório atrasado');
+  D.remindReport(s, late.id, 'i1', NOW);
+  assert.equal(late.reminders.length, 1);
+  D.submitReport(s, late.id, NOW);
+  D.approveReport(s, late.id, 'i1', NOW);
+  assert.equal(late.reports.filter(r => r.status === 'pendente').length, 1);
+  assert.throws(() => D.approveReport(s, late.id, 'i2', NOW), /Não há relatório/);
 });
 
-test('perfil e portal validam limites', () => {
-  const s = D.seed();
-  D.updateProfile(s, 's1', { name: ' Marina O. ', headline: 'Oi', bio: '', project: '' });
-  assert.equal(s.students[0].name, 'Marina O.');
+test('empresa só move as próprias candidaturas; fatura = ativos × preço', () => {
+  const s = D.seed(NOW);
+  const other = s.applications.find(a => s.jobs.find(j => j.id === a.vacancyId).companyId !== D.companyId);
+  assert.throws(() => D.moveApplication(s, other.id, 'Entrevista', NOW), /inválida/);
+  const e = D.employerMetrics(s, NOW);
+  assert.equal(e.bill, e.active * D.PRICE.intern);
+});
+
+test('plano, portal, perfil e indicação validam entradas', () => {
+  const s = D.seed(NOW);
+  assert.equal(D.planCost(s.institutions[0]), 4200);
+  D.setPlan(s, 'i1', 'essencial');
+  assert.equal(D.planCost(s.institutions[0]), 0);
+  assert.throws(() => D.updateBranding(s, 'i1', { portalName: 'Ok', accent: 'red' }), /cor/);
   assert.throws(() => D.updateProfile(s, 's1', { name: '' }), /nome/);
-  assert.throws(() => D.updateProfile(s, 's1', { name: 'A', bio: 'x'.repeat(601) }), /limites/);
-  D.updateBranding(s, 'i2', { portalName: 'Horizonte Carreiras', accent: '#7c4d72' });
-  assert.equal(D.portalName(s.institutions[1]), 'Horizonte Carreiras');
-  assert.throws(() => D.updateBranding(s, 'i2', { portalName: 'Ok', accent: 'red;x' }), /cor/);
-  assert.throws(() => D.updateBranding(s, 'i2', { portalName: 'x', accent: '#000000' }), /nome do portal/);
+  D.recommend(s, 's1', 'j1', 'i1'); D.recommend(s, 's1', 'j1', 'i1');
+  assert.equal(s.recommendations.filter(r => r.studentId === 's1').length, 1);
+  assert.throws(() => D.recommend(s, 's2', 'j1', 'i1'), /aluno e uma vaga/);
 });
 
-test('estágios e métricas ficam no escopo da instituição', () => {
-  const s = D.seed();
-  assert.deepEqual(D.internships(s, 'i1').map(a => a.id), ['a4']);
-  D.setDocumentStatus(s, 'a4', 'Assinado (simulação)', 'i1');
-  D.setReportStatus(s, 'a4', 'Relatório entregue', 'i1');
-  assert.equal(s.documents.a4, 'Assinado (simulação)');
-  assert.throws(() => D.setDocumentStatus(s, 'a4', 'Assinado (simulação)', 'i2'), /não encontrado/);
-  assert.throws(() => D.setReportStatus(s, 'a4', 'Qualquer', 'i1'), /inválida/);
-  const m = D.institutionMetrics(s, 'i1');
-  assert.equal(m.students, 3); assert.equal(m.applications, 3); assert.equal(m.hires, 1);
-  assert.equal(D.institutionMetrics(s, 'i2').applications, 1);
-});
-
-test('estado corrompido volta aos dados de exemplo', () => {
-  assert.equal(D.restore('{não é json').jobs.length, 6);
-  assert.equal(D.restore(JSON.stringify({ version: 2 })).version, 1);
-  const s = D.seed(); s.context.institutionId = 'i9';
-  assert.equal(D.restore(JSON.stringify(s)).context.institutionId, 'i1');
-  const ok = D.seed(); D.apply(ok, 'j2', 's1');
-  assert.equal(D.restore(JSON.stringify(ok)).applications.length, 6);
+test('CSV de empregabilidade e restauração de estado inválido', () => {
+  const s = D.seed(NOW);
+  const csv = D.employabilityCSV(s, 'i1', NOW).split('\r\n');
+  assert.equal(csv.length, 71);
+  assert.match(csv[0], /Situação/);
+  assert.equal(D.restore('{x').version, 2);
+  assert.equal(D.restore(JSON.stringify({ version: 1 })).version, 2);
+  assert.equal(D.restore(JSON.stringify(s)).students.length, 210);
 });
