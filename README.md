@@ -56,7 +56,7 @@ Se a porta 4173 já estiver ocupada, escolha outra (exemplo no Windows: `set POR
 5. **Aluno:** em Meu estágio, assine o termo.
 6. **Faculdade:** assine nas pendências. “Estagiando agora” sobe e a fatura da empresa aumenta R$ 40.
 
-Troque a faculdade no topo para ver outro portal (a Serra Azul está no plano gratuito). Em *Roteiro e ajuda* dá para restaurar os dados de exemplo.
+A rede de exemplo tem 6 faculdades em 6 estados, 14 empresas, 32 vagas e 435 alunos. Troque a faculdade no topo para ver outro portal (Serra Azul e Cerrado Vivo estão no plano gratuito); no perfil Empresa, troque a empresa para ver outro painel. Em *Roteiro e ajuda* dá para restaurar os dados de exemplo.
 
 ## Estrutura
 

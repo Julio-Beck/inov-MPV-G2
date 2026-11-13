@@ -5,10 +5,10 @@ import * as D from '../dist/domain.mjs';
 const NOW = '2026-11-13';
 const valid = (over = {}) => ({ title: 'Estágio em Mobile', description: 'Descrição.', course: 'Sistemas de Informação', type: 'Estágio', mode: 'Remoto', shift: 'Tarde', salary: 1500, hours: 30, minSemester: 2, supervisor: 'Ana', institutionIds: ['i1'], ...over });
 
-test('dados de exemplo: rede com 3 faculdades, escopo por faculdade', () => {
+test('dados de exemplo: rede com 6 faculdades, escopo por faculdade', () => {
   const s = D.seed(NOW);
-  assert.equal(s.institutions.length, 3);
-  assert.equal(D.studentsOf(s, 'i1').length, 70);
+  assert.equal(s.institutions.length, 6);
+  assert.equal(D.studentsOf(s, 'i1').length, 90);
   assert.equal(D.studentFor(s, 'i1').name, 'Lucas Ferreira');
   assert.ok(D.visibleJobs(s, 'i2').every(j => j.institutionIds.includes('i2')));
   assert.deepEqual(D.seed(NOW).students.map(x => x.name), s.students.map(x => x.name), 'geração determinística');
@@ -102,9 +102,19 @@ test('plano, portal, perfil e indicação validam entradas', () => {
 test('CSV de empregabilidade e restauração de estado inválido', () => {
   const s = D.seed(NOW);
   const csv = D.employabilityCSV(s, 'i1', NOW).split('\r\n');
-  assert.equal(csv.length, 71);
+  assert.equal(csv.length, 91);
   assert.match(csv[0], /Situação/);
-  assert.equal(D.restore('{x').version, 2);
-  assert.equal(D.restore(JSON.stringify({ version: 1 })).version, 2);
-  assert.equal(D.restore(JSON.stringify(s)).students.length, 210);
+  assert.equal(D.restore('{x').version, 3);
+  assert.equal(D.restore(JSON.stringify({ version: 2 })).version, 3);
+  assert.equal(D.restore(JSON.stringify(s)).students.length, 435);
+});
+
+test('empresa selecionada no contexto define vagas e publicação', () => {
+  const s = D.seed(NOW);
+  s.context.companyId = 'c8';
+  assert.ok(D.employerJobs(s).every(j => j.companyId === 'c8'));
+  const j = D.publish(s, valid({ course: 'Agronomia', institutionIds: ['i4'] }));
+  assert.equal(j.companyId, 'c8');
+  const other = s.applications.find(a => s.jobs.find(x => x.id === a.vacancyId).companyId === 'c1');
+  assert.throws(() => D.moveApplication(s, other.id, 'Entrevista', NOW), /inválida/);
 });

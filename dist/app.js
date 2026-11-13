@@ -198,7 +198,7 @@ function faculdadeTalentos() {
   return pageHead(D.portalName(i), 'Talentos', 'Seus alunos na rede. Indique quem combina com uma vaga: a empresa vê a indicação da faculdade.') +
     `<div class="toolbar card"><label class="field"><span>Curso</span><select data-change="talentCourse">${opts([['', 'Todos os cursos'], ...D.courses], ui.talentCourse)}</select></label>
       <label class="check"><input type="checkbox" data-change="talentFree"${ui.talentFree ? ' checked' : ''}><span>Só quem ainda não estagia</span></label><p class="muted small">${plural(list.length, 'aluno', 'alunos')}</p></div>
-    <ul class="plain-list people-list card">${shown.map(s => `<li class="row">${avatar(s.name)}<span class="grow"><strong>${esc(s.name)}</strong><br><small class="muted">${esc(s.course)} · ${s.semester}º semestre · aula de ${esc(s.shift.toLowerCase())}</small></span>${situation(s)}<button type="button" class="btn small ghost" data-action="recommend" data-id="${esc(s.id)}">Indicar</button></li>`).join('')}</ul>
+    <ul class="plain-list people-list card">${shown.map(s => `<li class="row">${avatar(s.name)}<span class="grow"><strong>${esc(s.name)}</strong><br><small class="muted">${esc(s.course)} · ${s.semester}º semestre · aula de ${esc(s.shift.toLowerCase())} · ${s.age} anos</small></span>${situation(s)}<button type="button" class="btn small ghost" data-action="recommend" data-id="${esc(s.id)}">Indicar</button></li>`).join('')}</ul>
     ${list.length > shown.length ? `<button type="button" class="btn ghost" data-action="more-talents">Mostrar mais (${list.length - shown.length})</button>` : ''}`;
 }
 
@@ -251,7 +251,7 @@ function faculdadePortal() {
 }
 
 /* ---------- EMPRESA ---------- */
-const myCompany = () => company(D.companyId);
+const myCompany = () => company(D.currentCompanyId(state));
 const employerApps = () => { const ids = new Set(D.employerJobs(state).map(j => j.id)); return state.applications.filter(a => ids.has(a.vacancyId)); };
 
 function empresaPainel() {
@@ -304,7 +304,7 @@ function empresaCandidatos() {
 }
 
 function empresaEstagiarios() {
-  const list = state.internships.filter(it => it.companyId === D.companyId).sort((a, b) => String(b.start).localeCompare(String(a.start)));
+  const list = state.internships.filter(it => it.companyId === D.currentCompanyId(state)).sort((a, b) => String(b.start).localeCompare(String(a.start)));
   return pageHead('Empresa', 'Estagiários', 'Termos, jornada e relatórios de cada estagiário, sem papel.') +
     (list.length ? `<div class="stack">${list.map(it => internshipCard(it, 'empresa')).join('')}</div>` : empty('Nenhum estagiário ainda', 'Quando você contratar alguém pela rede, o estágio aparece aqui.'));
 }
@@ -424,7 +424,7 @@ function alunoPerfil() {
   const s = student(), i = inst();
   const field = (name, label, max, value, area = false) => `<label class="field"><span>${esc(label)} <small class="counter" data-counter-for="${name}">${String(value || '').length}/${max}</small></span>${area ? `<textarea name="${name}" maxlength="${max}" rows="4">${esc(value)}</textarea>` : `<input name="${name}" maxlength="${max}" value="${esc(value)}"${name === 'name' ? ' required autocomplete="name"' : ''}>`}</label>`;
   return pageHead('Aluno', 'Meu perfil', 'É assim que as empresas veem você.') +
-    `<div class="two-col"><section class="card profile-card">${avatar(s.name, 'xl')}<h2>${esc(s.name)}</h2><p class="muted">${esc(s.headline)}</p>${tags([s.course, `${s.semester}º semestre`, `Aula de ${s.shift.toLowerCase()}`, i.shortName])}
+    `<div class="two-col"><section class="card profile-card">${avatar(s.name, 'xl')}<h2>${esc(s.name)}</h2><p class="muted">${esc(s.headline)}</p>${tags([s.course, `${s.semester}º semestre`, `Aula de ${s.shift.toLowerCase()}`, `${s.age} anos`, i.shortName])}
       <h3>Sobre</h3><p class="prose">${esc(s.bio) || '<span class="muted">Conte um pouco sobre você.</span>'}</p><h3>Projeto em destaque</h3><p class="prose">${esc(s.project) || '<span class="muted">Adicione um projeto da faculdade.</span>'}</p><h3>Habilidades</h3>${tags(s.skills || [])}</section>
       <form class="card form" data-form="profile"><h2>Editar informações</h2>${field('name', 'Nome', 80, s.name)}${field('headline', 'Título', 120, s.headline)}${field('bio', 'Sobre você', 600, s.bio, true)}${field('project', 'Projeto do portfólio', 180, s.project, true)}
         <p class="form-error" role="alert" hidden></p><div class="actions"><button class="btn primary" type="submit">Salvar perfil</button></div></form></div>`;
@@ -474,7 +474,7 @@ function render() {
       <span class="demo-badge" title="Dados fictícios">Demonstração</span>
       <div class="controls">
         <nav class="persona" aria-label="Ver como">${Object.keys(NAV).map(r => `<a href="${home(r)}"${r === activeRole && activePage !== 'ajuda' ? ' aria-current="true"' : ''}>${ROLE_LABEL[r]}</a>`).join('')}</nav>
-        ${activeRole === 'empresa' ? '' : `<label class="inst-select"><span class="sr-only">Faculdade</span><select data-change="institution" aria-label="Faculdade">${opts(state.institutions.map(x => [x.id, x.shortName]), i.id)}</select></label>`}
+        ${activeRole === 'empresa' ? `<label class="inst-select"><span class="sr-only">Empresa</span><select data-change="company" aria-label="Empresa">${opts(state.companies.map(x => [x.id, x.name]), D.currentCompanyId(state))}</select></label>` : `<label class="inst-select"><span class="sr-only">Faculdade</span><select data-change="institution" aria-label="Faculdade">${opts(state.institutions.map(x => [x.id, x.shortName]), i.id)}</select></label>`}
       </div></div>
       <nav class="tabs" aria-label="Seções"><div class="wrap tabs-inner">${NAV[activeRole].map(([p, label]) => `<a href="#/${activeRole}/${p}"${activePage === p ? ' aria-current="page"' : ''}>${label}</a>`).join('')}<a href="#/ajuda" class="help-link"${activePage === 'ajuda' ? ' aria-current="page"' : ''}>Roteiro e ajuda</a></div></nav>
     </header>
@@ -522,6 +522,7 @@ const ACTIONS = {
 
 const CHANGES = {
   institution: v => { state.context.institutionId = v; persist(); render(); toast(`Visualizando ${inst().shortName}.`); },
+  company: v => { state.context.companyId = v; ui.board = ''; persist(); render(); toast(`Visualizando ${myCompany().name}.`); },
   board: v => { ui.board = v; render(); $('[data-change="board"]')?.focus(); },
   estStatus: v => { ui.estStatus = v; render(); $('[data-change="estStatus"]')?.focus(); },
   talentCourse: v => { ui.talentCourse = v; ui.talentLimit = 20; render(); $('[data-change="talentCourse"]')?.focus(); },
