@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Persona v2 · Oportuniza Rede</title>
+<style>
+@page { size: 13.333in 7.5in; margin: 0; }
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { font-family: Arial, "Helvetica Neue", "Liberation Sans", sans-serif; color: #1e2b3a; }
+.slide { width: 13.333in; height: 7.5in; position: relative; padding: .55in .62in .4in; page-break-after: always; overflow: hidden; background: #fff; }
+.slide::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: .16in; background: #0e8a8a; }
+h1 { font-size: 26pt; margin: 0 0 .14in; color: #1e2b3a; letter-spacing: .01em; }
+.sub { color: #6b7785; font-size: 13pt; margin: 0 0 .45in; }
+.num { color: #0e8a8a; font-weight: 700; font-size: 20pt; }
+.grid4 { display: grid; grid-template-columns: 1fr 1fr; gap: .42in .7in; }
+.item { display: grid; grid-template-columns: .55in 1fr; }
+.item h3 { margin: 0 0 .08in; font-size: 17pt; }
+.item p { margin: 0; color: #0e7f80; font-size: 12.5pt; line-height: 1.38; }
+.frase { position: absolute; left: .62in; right: .62in; bottom: .62in; border: 1px solid #c9d6de; background: #f3f7fa; border-radius: .14in; padding: .17in .22in; }
+.frase b { display: block; color: #0e8a8a; font-size: 11pt; margin-bottom: .06in; letter-spacing: .02em; }
+.frase span { font-size: 12.5pt; }
+.pg { position: absolute; right: .3in; bottom: .25in; font-size: 9pt; color: #6b7785; }
+.foot { position: absolute; left: .62in; bottom: .25in; font-size: 9pt; color: #6b7785; }
+.meta { display: flex; justify-content: space-between; font-size: 12pt; margin: -.25in 0 .18in; }
+.two { display: grid; grid-template-columns: 3.65in 1fr; gap: .38in; }
+.draw { border: 1px solid #c9d6de; border-radius: .14in; overflow: hidden; background: #f3f7fa; }
+.draw h4 { margin: 0; background: #1e2b3a; color: #fff; font-size: 13pt; padding: .15in .2in; letter-spacing: .02em; }
+.draw .img { margin: .16in; border-radius: .14in; overflow: hidden; border: 1px solid #d5dee5; background: #fff; }
+.draw svg { display: block; width: 100%; height: auto; }
+.fala { padding: 0 .2in .16in; } .fala b { color: #0e8a8a; font-size: 10.5pt; } .fala p { margin: .04in 0 0; font-style: italic; font-size: 10.6pt; line-height: 1.32; }
+.fields { display: grid; grid-template-columns: 1fr 1fr; gap: .2in .42in; align-content: start; }
+.f h5 { margin: 0; color: #0e8a8a; font-size: 12.5pt; letter-spacing: .02em; }
+.f small { display: block; color: #6b7785; font-size: 10.5pt; margin: .03in 0 .05in; }
+.f p { margin: 0; font-size: 10.3pt; line-height: 1.33; }
+</style></head><body>
+
+<section class="slide">
+  <h1>PARTE 1: PERSONA</h1>
+  <p class="sub">Uma personagem que representa um perfil de usuário em um contexto de uso específico.</p>
+  <div class="grid4">
+    <div class="item"><span class="num">01</span><div><h3>Contexto de uso</h3><p>Uma faculdade privada de médio porte, fora da capital, precisa aproximar os alunos do mercado e comprovar empregabilidade, mas gere os estágios em papel, planilha e WhatsApp.</p></div></div>
+    <div class="item"><span class="num">02</span><div><h3>Desenho da persona</h3><p>Renata, coordenadora de Carreiras e Estágios, no fim do expediente, com uma pilha de termos de estágio para assinar e o relatório de egressos do MEC aberto no notebook (desenho no slide 2).</p></div></div>
+    <div class="item"><span class="num">03</span><div><h3>Perfil relevante</h3><p>41 anos, formada em Administração, especialista em gestão educacional. Ela e uma assistente atendem 30 cursos e 4.500 alunos. Responde à pró-reitoria e não decide gastos sozinha.</p></div></div>
+    <div class="item"><span class="num">04</span><div><h3>Base para as escolhas</h3><p>Obrigações da faculdade na Lei do Estágio (11.788/2008), indicador de egressos da avaliação do MEC e pesquisas CIEE/Locomotiva e Semesp. Ainda não entrevistamos coordenadoras reais.</p></div></div>
+  </div>
+  <div class="frase"><b>CONTEXTO EM UMA FRASE</b><span>“Quando precisa provar a empregabilidade dos alunos, Renata quer estágios organizados e empresas chegando, mas esbarra em papelada, equipe pequena e falta de dados.”</span></div>
+  <span class="pg">1</span>
+</section>
+
+<section class="slide">
+  <h1>PARTE 1: PERSONA</h1>
+  <p class="sub" style="margin-bottom:.38in">Desenhem a persona no contexto de uso e preencham os campos com informações relevantes para essa situação.</p>
+  <div class="meta"><span>EQUIPE: Julio, Douglas, Jessica e Thales</span><span>CONTEXTO / PROJETO: Oportuniza Rede, central de carreiras e estágios para faculdades</span></div>
+  <div class="two">
+    <div class="draw"><h4>DESENHO NO CONTEXTO DE USO</h4>
+      <div class="img"><svg viewBox="0 0 400 270" role="img" aria-label="Renata na mesa da coordenação, com termos de estágio e notebook">
+        <rect width="400" height="270" fill="#e9eef2"/>
+        <rect x="248" y="22" width="120" height="86" rx="6" fill="#2f4a63"/><rect x="254" y="28" width="108" height="74" rx="4" fill="#f2a65a" opacity=".55"/><circle cx="330" cy="52" r="10" fill="#f6d17a"/><path d="M254 90h108v12H254z" fill="#3b5873"/><path d="M308 28v74M254 65h108" stroke="#2f4a63" stroke-width="4"/>
+        <circle cx="40" cy="56" r="20" fill="#fff" stroke="#2f4a63" stroke-width="3"/><path d="M40 56V43M40 56l9 5" stroke="#2f4a63" stroke-width="3" stroke-linecap="round"/>
+        <rect x="72" y="34" width="92" height="54" rx="4" fill="#fff" stroke="#c7d1d9"/><text x="80" y="52" font-size="9" fill="#1e2b3a" font-family="Arial" font-weight="700">Avaliação MEC</text><text x="80" y="66" font-size="8" fill="#6b7785" font-family="Arial">Egressos: entregar</text><text x="80" y="78" font-size="8" fill="#c0392b" font-family="Arial">até sexta</text>
+        <path d="M150 128c0-30 22-48 50-48s50 18 50 48v66H150z" fill="#245847"/>
+        <path d="M188 120h24l-12 22z" fill="#fff"/>
+        <rect x="191" y="98" width="18" height="18" fill="#b9805a"/>
+        <circle cx="200" cy="84" r="26" fill="#c68a62"/>
+        <path d="M172 82c0-22 14-32 28-32s30 10 30 30c-6-10-18-16-30-16s-22 6-28 18z" fill="#3b2a20"/><circle cx="224" cy="58" r="11" fill="#3b2a20"/>
+        <circle cx="190" cy="86" r="2.4" fill="#2a1d16"/><circle cx="210" cy="86" r="2.4" fill="#2a1d16"/>
+        <path d="M184 80l10-4M216 80l-10-4" stroke="#2a1d16" stroke-width="2" stroke-linecap="round"/><path d="M193 98q7-4 14 0" stroke="#7a3d2a" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M232 132c18 4 22 26 8 42l-26 6" stroke="#245847" stroke-width="16" fill="none" stroke-linecap="round"/><circle cx="214" cy="181" r="8" fill="#c68a62"/>
+        <rect x="0" y="186" width="400" height="84" fill="#8b6b4a"/><rect x="0" y="186" width="400" height="8" fill="#a07e5a"/>
+        <g transform="rotate(-6 70 176)"><rect x="34" y="150" width="78" height="38" fill="#fff" stroke="#c7d1d9"/></g><g transform="rotate(4 74 170)"><rect x="36" y="142" width="78" height="40" fill="#fff" stroke="#c7d1d9"/></g>
+        <rect x="38" y="132" width="78" height="44" fill="#fff" stroke="#c7d1d9"/><text x="44" y="148" font-size="8.5" font-weight="700" fill="#1e2b3a" font-family="Arial">Termos de</text><text x="44" y="160" font-size="8.5" font-weight="700" fill="#1e2b3a" font-family="Arial">estágio (32)</text><path d="M44 168h60" stroke="#c7d1d9" stroke-width="2"/>
+        <path d="M262 186l10-46h96l10 46z" fill="#5d6b78"/><rect x="276" y="146" width="88" height="34" rx="2" fill="#f7fafc"/>
+        <path d="M282 154h40M282 162h70M282 170h56" stroke="#9fb0bf" stroke-width="3"/><rect x="250" y="186" width="140" height="7" rx="2" fill="#4a5764"/>
+        <rect x="140" y="200" width="30" height="52" rx="5" fill="#1e2b3a"/><rect x="143" y="205" width="24" height="40" rx="2" fill="#dff3e4"/><rect x="146" y="210" width="16" height="6" rx="3" fill="#3a9a5b"/><rect x="149" y="220" width="15" height="6" rx="3" fill="#3a9a5b"/><rect x="146" y="230" width="17" height="6" rx="3" fill="#3a9a5b"/>
+        <circle cx="166" cy="203" r="6" fill="#c0392b"/><text x="163.5" y="206" font-size="7" fill="#fff" font-family="Arial" font-weight="700">9</text>
+        <rect x="196" y="214" width="50" height="34" rx="3" fill="#f6e7a6" transform="rotate(-4 220 230)"/><text x="202" y="230" font-size="7.5" fill="#6b5a1a" font-family="Arial" transform="rotate(-4 220 230)">cobrar 5</text><text x="202" y="240" font-size="7.5" fill="#6b5a1a" font-family="Arial" transform="rotate(-4 220 230)">relatórios</text>
+      </svg></div>
+      <div class="fala"><b>FALA DA PERSONA</b><p>“Eu sei que nossos alunos são bons. O que eu não consigo é provar isso: não tenho tempo de correr atrás de empresa, e os termos de estágio tomam a minha semana.”</p></div>
+    </div>
+    <div class="fields">
+      <div class="f"><h5>NOME E PERFIL</h5><small>Quem é? O que importa para este uso?</small><p><b>Renata Moraes, 41 anos,</b> coordenadora de Carreiras e Estágios de um centro universitário privado de 4.500 alunos, numa cidade de 300 mil habitantes. Ela e uma assistente atendem 30 cursos.</p></div>
+      <div class="f"><h5>CONTEXTO DE USO</h5><small>Onde, quando, com quem e em quais condições?</small><p>Na sala da coordenação, em horário comercial e no fim do dia, pelo computador. Usa o sistema acadêmico, planilhas, e-mail e um grupo de WhatsApp por curso. Gastos dependem da direção.</p></div>
+      <div class="f"><h5>OBJETIVO E MOTIVAÇÃO</h5><small>O que quer realizar? Por que isso importa?</small><p>Aumentar a parcela de alunos estagiando, manter os termos em dia e ter números de empregabilidade para a avaliação do MEC e para atrair novos alunos.</p></div>
+      <div class="f"><h5>COMPORTAMENTO ATUAL</h5><small>Como faz hoje? Quais recursos utiliza?</small><p>Repassa por e-mail as vagas que recebe, assina termos um a um e cobra relatórios semestrais manualmente. Parte dos estágios passa por agente de integração, e ela só assina.</p></div>
+      <div class="f"><h5>DIFICULDADES E NECESSIDADES</h5><small>O que atrapalha? De que apoio precisa?</small><p>Retrabalho com documentos, poucas empresas parceiras e nenhum dado confiável de quem está estagiando. Precisa de uma ferramenta pronta, sem equipe nova nem orçamento alto.</p></div>
+      <div class="f"><h5>EVIDÊNCIAS E HIPÓTESES</h5><small>O que sabemos? O que falta confirmar?</small><p><b>Sabemos:</b> a lei obriga a faculdade a assinar o termo e acompanhar relatórios a cada 6 meses; 75% dos universitários pesam o estágio ao escolher a faculdade. <b>Falta confirmar:</b> como ela compra e quanto a faculdade pagaria.</p></div>
+    </div>
+  </div>
+  <span class="foot">A mesma persona será a protagonista do storyboard.</span><span class="pg">2</span>
+</section>
+</body></html>
