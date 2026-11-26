@@ -7,10 +7,11 @@ import * as D from './domain.mjs';
  * ------------------------------------------------------------------ */
 
 const KEY = 'oportuniza-rede-v2';
+// [página, rótulo, rótulo curto (barra inferior no celular), ícone]
 const NAV = {
-  faculdade: [['painel', 'Painel'], ['estagios', 'Estágios'], ['talentos', 'Talentos'], ['empresas', 'Empresas da rede'], ['portal', 'Portal e plano']],
-  empresa: [['painel', 'Painel'], ['vagas', 'Minhas vagas'], ['candidatos', 'Candidatos'], ['estagiarios', 'Estagiários']],
-  aluno: [['vagas', 'Vagas'], ['candidaturas', 'Candidaturas'], ['estagio', 'Meu estágio'], ['perfil', 'Meu perfil']],
+  faculdade: [['painel', 'Painel', 'Painel', 'home'], ['estagios', 'Estágios', 'Estágios', 'doc'], ['talentos', 'Talentos', 'Talentos', 'people'], ['empresas', 'Empresas da rede', 'Empresas', 'building'], ['portal', 'Portal e plano', 'Portal', 'brush']],
+  empresa: [['painel', 'Painel', 'Painel', 'home'], ['vagas', 'Minhas vagas', 'Vagas', 'brief'], ['candidatos', 'Candidatos', 'Candidatos', 'people'], ['estagiarios', 'Estagiários', 'Estagiários', 'doc']],
+  aluno: [['vagas', 'Vagas', 'Vagas', 'search'], ['candidaturas', 'Candidaturas', 'Candidaturas', 'list'], ['estagio', 'Meu estágio', 'Estágio', 'doc'], ['perfil', 'Meu perfil', 'Perfil', 'user']],
 };
 const ROLE_LABEL = { faculdade: 'Faculdade', empresa: 'Empresa', aluno: 'Aluno' };
 const ACCENTS = [['#245847', 'Verde'], ['#425e99', 'Azul'], ['#7c4d72', 'Ameixa'], ['#8a4b2f', 'Terracota'], ['#2f5f73', 'Petróleo'], ['#5d5a24', 'Oliva']];
@@ -25,6 +26,15 @@ const ICON = {
   alert: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17v.5"/></svg>',
   doc: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4M10 12h5M10 16h5"/></svg>',
   download: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>',
+  help: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.4M12 17v.5"/></svg>',
+  home: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-6.5 8 6.5M6 9.5V20h12V9.5"/></svg>',
+  people: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8.5" r="3.2"/><path d="M3.5 19c.6-3 2.8-4.8 5.5-4.8s4.9 1.8 5.5 4.8M15.5 5.6a3.2 3.2 0 0 1 0 6M17 14.5c1.9.6 3.1 2.2 3.5 4.5"/></svg>',
+  building: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V5h9v15M14 9h5v11M3 20h18M8 8.5h3M8 12h3M8 15.5h3"/></svg>',
+  brush: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h16M6 16l9.5-9.5 2 2L8 18H6z"/></svg>',
+  brief: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16v11H4zM9 8V5h6v3M4 13h16"/></svg>',
+  search: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg>',
+  list: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></svg>',
+  user: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c.9-3.6 3.9-5.6 7.5-5.6s6.6 2 7.5 5.6"/></svg>',
 };
 
 /* ---------- utilidades ---------- */
@@ -52,7 +62,7 @@ function persist() {
   try { localStorage.setItem(KEY, JSON.stringify(state)); } catch { storageOk = false; }
 }
 let state = load();
-const ui = { q: '', type: '', mode: '', onlyCompatible: true, board: '', talentCourse: '', talentFree: false, talentLimit: 20, estStatus: '' };
+const ui = { q: '', type: '', mode: '', onlyCompatible: true, board: '', talentCourse: '', talentFree: false, talentLimit: 20, estStatus: '', boardMore: {} };
 let lastRoute = '';
 
 const inst = () => state.institutions.find(i => i.id === state.context.institutionId) || state.institutions[0];
@@ -92,17 +102,18 @@ const modalHead = title => `<header class="modal-head"><h2 id="modal-title">${es
 const logo = (c, size = '') => `<span class="logo ${size}" style="--logo-bg:${esc(c.color)};--logo-ink:${esc(c.ink)}" aria-hidden="true">${esc(c.initials)}</span>`;
 const avatar = (name, size = '') => `<span class="avatar ${size}" aria-hidden="true">${esc(initials(name))}</span>`;
 const tags = list => `<ul class="tags">${list.filter(Boolean).map(t => `<li>${esc(t)}</li>`).join('')}</ul>`;
-const jobTags = j => tags([j.type, j.mode, `Turno: ${j.shift}`, `${j.hours}h/semana`, `A partir do ${j.minSemester}º sem.`]);
+const jobMeta = j => [j.type, j.mode, `turno da ${j.shift.toLowerCase()}`, `${j.hours}h por semana`, `a partir do ${j.minSemester}º semestre`].join(' · ');
 const stepper = stage => {
   const idx = D.stages.indexOf(stage);
   return `<ol class="stepper" aria-label="Etapa atual: ${esc(stage)}">${D.stages.map((s, i) => `<li class="${i < idx ? 'done' : i === idx ? 'current' : ''}"${i === idx ? ' aria-current="step"' : ''}><span>${esc(s)}</span></li>`).join('')}</ol>`;
 };
 const empty = (title, text, action = '') => `<div class="empty card"><h2>${esc(title)}</h2><p>${esc(text)}</p>${action}</div>`;
-const metric = (value, label, note = '', accent = false) => `<div class="metric card${accent ? ' accent' : ''}"><strong>${esc(value)}</strong><span>${esc(label)}</span>${note ? `<small>${esc(note)}</small>` : ''}</div>`;
+const metric = (value, label, note = '', primary = false) => `<div class="metric${primary ? ' primary' : ''}"><strong>${esc(value)}</strong><span>${esc(label)}</span>${note ? `<small>${esc(note)}</small>` : ''}</div>`;
 const pageHead = (eyebrow, title, lead = '', actions = '') => `<header class="page-head"><div><p class="eyebrow">${esc(eyebrow)}</p><h1 tabindex="-1">${esc(title)}</h1>${lead ? `<p class="lead">${esc(lead)}</p>` : ''}</div>${actions ? `<div class="head-actions">${actions}</div>` : ''}</header>`;
 const STATUS_CLASS = { 'Ativo': 'ok', 'Aguardando assinaturas': 'warn', 'Relatório atrasado': 'bad', 'Encerrado': 'off', 'Assinado, começa em breve': 'info' };
 const statusChip = it => { const s = D.internshipStatus(it, now()); return `<span class="chip ${STATUS_CLASS[s] || ''}">${esc(s)}</span>`; };
 const sigs = it => `<ul class="sigs" aria-label="Assinaturas do termo">${Object.keys(PARTY).map(p => `<li class="${it.signatures[p] ? 'on' : ''}">${it.signatures[p] ? ICON.check : ICON.clock}<span>${PARTY[p]}${it.signatures[p] ? '' : ' (pendente)'}</span></li>`).join('')}</ul>`;
+const pendingSigs = it => Object.keys(PARTY).some(p => !it.signatures[p]) ? sigs(it) : '';
 function reportLine(it) {
   const r = D.nextReport(it); if (!r) return '<span class="muted small">Relatórios em dia</span>';
   const d = D.daysBetween(now(), r.due);
@@ -112,28 +123,28 @@ function reportLine(it) {
 }
 
 /* ---------- FACULDADE ---------- */
-function pendItem(icon, text, action = '') { return `<li class="pend">${icon}<span class="grow">${text}</span>${action}</li>`; }
+function pendItem(icon, text, action = '', tone = '') { return `<li class="pend${tone ? ` ${tone}` : ''}">${icon}<span class="grow">${text}</span>${action}</li>`; }
 function faculdadePainel() {
   const i = inst(), m = D.institutionMetrics(state, i.id, now()), p = m.pending;
   const who = it => `<strong>${esc(studentById(it.studentId)?.name)}</strong> · ${esc(company(it.companyId).name)}`;
   const items = [
     ...p.signatures.map(it => pendItem(ICON.doc, `Termo de ${who(it)} aguarda a assinatura da faculdade`, `<button type="button" class="btn small primary" data-action="sign" data-id="${esc(it.id)}" data-party="faculdade">Assinar termo</button>`)),
-    ...p.overdue.map(it => { const r = D.nextReport(it); return pendItem(ICON.alert, `Relatório de ${who(it)} atrasado há ${plural(-D.daysBetween(now(), r.due), 'dia', 'dias')}`, `<button type="button" class="btn small" data-action="remind" data-id="${esc(it.id)}">${it.reminders.length ? 'Cobrar de novo' : 'Cobrar'}</button>`); }),
+    ...p.overdue.map(it => { const r = D.nextReport(it); return pendItem(ICON.alert, `Relatório de ${who(it)} atrasado há ${plural(-D.daysBetween(now(), r.due), 'dia', 'dias')}`, `<button type="button" class="btn small" data-action="remind" data-id="${esc(it.id)}">${it.reminders.length ? 'Cobrar de novo' : 'Cobrar'}</button>`, 'bad'); }),
     ...p.toApprove.map(it => pendItem(ICON.doc, `Relatório de ${who(it)} entregue para análise`, `<button type="button" class="btn small" data-action="approve" data-id="${esc(it.id)}">Aprovar</button>`)),
-    ...p.dueSoon.map(it => { const r = D.nextReport(it); return pendItem(ICON.clock, `Relatório de ${who(it)} vence em ${plural(D.daysBetween(now(), r.due), 'dia', 'dias')}`); }),
+    ...p.dueSoon.map(it => { const r = D.nextReport(it); return pendItem(ICON.clock, `Relatório de ${who(it)} vence em ${plural(D.daysBetween(now(), r.due), 'dia', 'dias')}`, '', 'warn'); }),
   ];
   const recent = state.applications.filter(a => studentById(a.studentId)?.institutionId === i.id).sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt))).slice(0, 5);
   const exportBtn = i.plan === 'gestao'
     ? `<button type="button" class="btn" data-action="export">${ICON.download}Exportar relatório de empregabilidade</button>`
     : `<a class="btn ghost" href="#/faculdade/portal" title="Disponível no plano Gestão">${ICON.download}Relatório de empregabilidade (plano Gestão)</a>`;
   return pageHead(D.portalName(i), i.name, `${i.city} · ${num(i.enrolled)} alunos matriculados · plano ${i.plan === 'gestao' ? 'Gestão' : 'Essencial'}`, exportBtn) +
-    `<div class="metrics">${metric(num(m.students), 'Alunos na plataforma')}${metric(num(m.interning), 'Estagiando agora', `${pct(m.pct)} dos alunos na plataforma`, true)}${metric(num(m.hiresSemester), 'Contratações no semestre')}${metric(num(m.companies), 'Empresas com estagiários seus', `${m.vacancies} vagas abertas para seus alunos`)}</div>
-    <div class="two-col">
-      <section class="card"><div class="section-head"><h2>Pendências de estágio</h2><a href="#/faculdade/estagios">Ver todos os estágios</a></div>
+    `<div class="metrics has-primary">${metric(num(m.interning), 'Estagiando agora', `${pct(m.pct)} dos alunos na plataforma`, true)}${metric(num(m.students), 'Alunos na plataforma')}${metric(num(m.hiresSemester), 'Contratações no semestre')}${metric(num(m.companies), 'Empresas com estagiários seus', `${m.vacancies} vagas abertas para seus alunos`)}</div>
+    <div class="two-col main-left">
+      <section class="card"><div class="section-head"><h2>Pendências${items.length ? ` <span class="count-pill">${items.length}</span>` : ''}</h2><a href="#/faculdade/estagios">Ver estágios</a></div>
         ${items.length ? `<ul class="plain-list pend-list">${items.join('')}</ul>` : '<p class="ok-line">' + ICON.check + 'Nenhuma pendência: termos e relatórios em dia.</p>'}
         <p class="muted small">Pela Lei do Estágio, a faculdade assina o termo de compromisso e acompanha relatórios a cada 6 meses.</p></section>
       <section class="card"><h2>Estagiando por curso</h2><p class="muted small">Alunos com estágio ativo sobre o total do curso na plataforma.</p>
-        <ul class="bars wide">${m.byCourse.map(c => `<li><span>${esc(c.course)}</span><span class="bar" aria-hidden="true"><i style="width:${Math.max(c.pct * 100, 1)}%"></i></span><strong>${pct(c.pct)}</strong><small class="muted">${c.interns}/${c.students}</small></li>`).join('')}</ul></section>
+        <ul class="bars">${m.byCourse.map(c => `<li${c.pct ? '' : ' class="zero"'}><span>${esc(c.course)}</span><span class="bar" aria-hidden="true"><i style="width:${Math.max(c.pct * 100, 1)}%"></i></span><strong>${pct(c.pct)}</strong><small class="muted">${c.interns}/${c.students}</small></li>`).join('')}</ul></section>
     </div>
     <section class="card"><div class="section-head"><h2>Candidaturas recentes dos seus alunos</h2><a href="#/faculdade/talentos">Ver talentos</a></div>
       ${recent.length ? `<ul class="plain-list divided">${recent.map(a => { const s = studentById(a.studentId), j = job(a.vacancyId); return `<li class="row">${avatar(s?.name)}<span class="grow"><strong>${esc(s?.name)}</strong><br><small class="muted">${esc(j?.title)} · ${esc(company(j?.companyId).name)}</small></span><span class="chip stage-${D.stages.indexOf(a.stage)}">${esc(a.stage)}</span></li>`; }).join('')}</ul>` : '<p class="muted">Nenhuma candidatura ainda.</p>'}</section>`;
@@ -142,18 +153,16 @@ function faculdadePainel() {
 function internshipCard(it, viewer) {
   const s = studentById(it.studentId), j = job(it.vacancyId), c = company(it.companyId), r = D.nextReport(it), st = D.internshipStatus(it, now());
   const actions = [
-    `<button type="button" class="btn small ghost" data-action="termo" data-id="${esc(it.id)}">${ICON.doc}Ver termo</button>`,
+    `<button type="button" class="btn small" data-action="termo" data-id="${esc(it.id)}">${ICON.doc}Ver termo</button>`,
     viewer === 'faculdade' && !it.signatures.faculdade ? `<button type="button" class="btn small primary" data-action="sign" data-id="${esc(it.id)}" data-party="faculdade">Assinar como faculdade</button>` : '',
     viewer === 'faculdade' && st === 'Relatório atrasado' ? `<button type="button" class="btn small" data-action="remind" data-id="${esc(it.id)}">${it.reminders.length ? 'Cobrar de novo' : 'Cobrar relatório'}</button>` : '',
     viewer === 'faculdade' && r?.status === 'entregue' ? `<button type="button" class="btn small" data-action="approve" data-id="${esc(it.id)}">Aprovar relatório</button>` : '',
     viewer === 'empresa' && r?.status === 'pendente' && D.isActive(it, now()) ? `<button type="button" class="btn small" data-action="report" data-id="${esc(it.id)}">Enviar relatório</button>` : '',
   ].join('');
-  return `<article class="card intern">
-    <div class="intern-main">
-      <div class="app-info">${viewer === 'empresa' ? avatar(s?.name) : logo(c)}<div><h3>${esc(s?.name)}</h3><p>${esc(j?.title)} · ${esc(c.name)}</p><p class="muted small">${esc(s?.course)} · ${esc(s?.semester)}º semestre · ${esc(instById(it.institutionId)?.shortName)}</p></div></div>
-      <div class="intern-meta"><span class="muted small">${esc(fmtDate(it.start))} a ${esc(fmtDate(it.end))} · ${it.hours}h/semana · ${money(it.salary)}/mês</span>${reportLine(it)}${it.reminders.length ? `<span class="muted small">Cobrado ${plural(it.reminders.length, 'vez', 'vezes')}, a última em ${esc(fmtDate(it.reminders.at(-1)))}</span>` : ''}</div>
-    </div>
-    <div class="intern-side">${statusChip(it)}${sigs(it)}<div class="row-actions">${actions}</div></div>
+  return `<article class="intern">
+    <div class="intern-main"><h3>${esc(s?.name)}</h3><p>${esc(j?.title)} · ${esc(c.name)}</p><p class="muted small">${esc(s?.course)} · ${esc(s?.semester)}º semestre · ${esc(instById(it.institutionId)?.shortName)}</p></div>
+    <div class="intern-meta"><span>${esc(fmtDate(it.start))} a ${esc(fmtDate(it.end))}</span><span class="muted">${it.hours}h por semana · ${money(it.salary)}/mês</span>${reportLine(it)}${it.reminders.length ? `<span class="muted small">Cobrado ${plural(it.reminders.length, 'vez', 'vezes')}, a última em ${esc(fmtDate(it.reminders.at(-1)))}</span>` : ''}</div>
+    <div class="intern-side">${statusChip(it)}${pendingSigs(it)}<div class="row-actions">${actions}</div></div>
   </article>`;
 }
 
@@ -165,7 +174,7 @@ function faculdadeEstagios() {
   return pageHead(D.portalName(i), 'Estágios', 'Termos de compromisso, assinaturas e relatórios em um lugar só.') +
     `<div class="toolbar card"><label class="field"><span>Situação</span><select data-change="estStatus">${opts([['', `Todas (${all.length})`], ...statuses.map(s => [s, `${s} (${count(s)})`])], ui.estStatus)}</select></label>
       <p class="muted small">Assinaturas e documentos são simulados nesta demonstração.</p></div>` +
-    (list.length ? `<div class="stack">${list.map(it => internshipCard(it, 'faculdade')).join('')}</div>` : empty('Nenhum estágio nesta situação', 'Troque o filtro para ver outros estágios.'));
+    (list.length ? `<div class="card list">${list.map(it => internshipCard(it, 'faculdade')).join('')}</div>` : empty('Nenhum estágio nesta situação', 'Troque o filtro para ver outros estágios.'));
 }
 
 function termoDialog(id) {
@@ -198,7 +207,7 @@ function faculdadeTalentos() {
   return pageHead(D.portalName(i), 'Talentos', 'Seus alunos na rede. Indique quem combina com uma vaga: a empresa vê a indicação da faculdade.') +
     `<div class="toolbar card"><label class="field"><span>Curso</span><select data-change="talentCourse">${opts([['', 'Todos os cursos'], ...D.courses], ui.talentCourse)}</select></label>
       <label class="check"><input type="checkbox" data-change="talentFree"${ui.talentFree ? ' checked' : ''}><span>Só quem ainda não estagia</span></label><p class="muted small">${plural(list.length, 'aluno', 'alunos')}</p></div>
-    <ul class="plain-list people-list card">${shown.map(s => `<li class="row">${avatar(s.name)}<span class="grow"><strong>${esc(s.name)}</strong><br><small class="muted">${esc(s.course)} · ${s.semester}º semestre · aula de ${esc(s.shift.toLowerCase())} · ${s.age} anos</small></span>${situation(s)}<button type="button" class="btn small ghost" data-action="recommend" data-id="${esc(s.id)}">Indicar</button></li>`).join('')}</ul>
+    <ul class="plain-list people-list card list">${shown.map(s => `<li class="row">${avatar(s.name)}<span class="grow"><strong>${esc(s.name)}</strong><br><small class="muted">${esc(s.course)} · ${s.semester}º semestre · aula de ${esc(s.shift.toLowerCase())} · ${s.age} anos</small></span>${situation(s)}<button type="button" class="btn small" data-action="recommend" data-id="${esc(s.id)}">Indicar</button></li>`).join('')}</ul>
     ${list.length > shown.length ? `<button type="button" class="btn ghost" data-action="more-talents">Mostrar mais (${list.length - shown.length})</button>` : ''}`;
 }
 
@@ -222,12 +231,12 @@ function faculdadeEmpresas() {
   }).filter(r => r.open || r.interns).sort((a, b) => b.interns - a.interns || b.open - a.open);
   return pageHead(D.portalName(i), 'Empresas da rede', `Empresas que publicam vagas para a ${i.shortName} ou já têm estagiários seus. A rede inteira trabalha por você.`, '<button type="button" class="btn primary" data-action="invite">Convidar empresa</button>') +
     `<div class="metrics">${metric(num(state.companies.length), 'Empresas na rede')}${metric(num(rows.length), 'Recrutando seus alunos')}${metric(num(state.institutions.length), 'Faculdades na rede')}</div>
-    <div class="stack">${rows.map(({ c, open, interns }) => `<article class="card vac-row">${logo(c)}<div class="grow"><h2 class="h3">${esc(c.name)}</h2><p class="muted small">${esc(c.sector)} · ${esc(c.city)}</p></div><span class="chip">${plural(open, 'vaga aberta', 'vagas abertas')}</span><span class="chip ${interns ? 'ok' : 'off'}">${plural(interns, 'estagiário seu', 'estagiários seus')}</span></article>`).join('')}</div>`;
+    <div class="card list">${rows.map(({ c, open, interns }) => `<article class="vac-row">${logo(c)}<div class="grow"><h2 class="h3">${esc(c.name)}</h2><p class="muted small">${esc(c.sector)} · ${esc(c.city)}</p></div><div class="chips"><span class="chip">${plural(open, 'vaga aberta', 'vagas abertas')}</span><span class="chip ${interns ? 'ok' : 'off'}">${plural(interns, 'estagiário seu', 'estagiários seus')}</span></div></article>`).join('')}</div>`;
 }
 
 function faculdadePortal() {
   const i = inst(), accent = safeAccent(i.accent);
-  const plan = (id, name, price, items) => `<article class="card plan${i.plan === id ? ' current' : ''}"><div class="row-title"><h3>${esc(name)}</h3>${i.plan === id ? '<span class="chip ok">Plano atual</span>' : ''}</div><p class="plan-price">${price}</p><ul class="checks">${items.map(t => `<li>${ICON.check}${esc(t)}</li>`).join('')}</ul>${i.plan === id ? '' : `<button type="button" class="btn small" data-action="set-plan" data-plan="${id}">Mudar para ${esc(name)}</button>`}</article>`;
+  const plan = (id, name, price, items) => `<article class="card plan${id === 'gestao' ? ' featured' : ''}${i.plan === id ? ' current' : ''}"><div class="row-title"><h3>${esc(name)}</h3>${i.plan === id ? '<span class="chip ok">Plano atual</span>' : id === 'gestao' ? '<span class="chip info">Recomendado</span>' : ''}</div><p class="plan-price">${price}</p><ul class="checks">${items.map(t => `<li>${ICON.check}${esc(t)}</li>`).join('')}</ul>${i.plan === id ? '' : `<button type="button" class="btn${id === 'gestao' ? ' primary' : ''}" data-action="set-plan" data-plan="${id}">Mudar para ${esc(name)}</button>`}</article>`;
   return pageHead(D.portalName(i), 'Portal e plano', 'Sua marca na central de carreiras e o plano contratado.') +
     `<div class="two-col">
       <form class="card form" data-form="branding">
@@ -258,9 +267,9 @@ function empresaPainel() {
   const c = myCompany(), m = D.employerMetrics(state, now());
   const recent = [...employerApps()].sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt))).slice(0, 5);
   return pageHead('Empresa', c.name, `${c.sector} · recrutando em ${plural(m.institutions, 'faculdade', 'faculdades')} da rede.`, '<button type="button" class="btn primary" data-action="new-job">Publicar vaga</button>') +
-    `<div class="metrics">${metric(m.open, 'Vagas abertas')}${metric(m.applications, 'Candidaturas')}${metric(m.interviews, 'Em entrevista')}${metric(m.active, 'Estagiários ativos', m.pendingSign ? `${m.pendingSign} termo(s) aguardando assinatura` : '', true)}</div>
+    `<div class="metrics has-primary">${metric(m.active, 'Estagiários ativos', m.pendingSign ? `${plural(m.pendingSign, 'termo aguardando', 'termos aguardando')} assinatura` : 'todos com termo assinado', true)}${metric(m.open, 'Vagas abertas')}${metric(m.applications, 'Candidaturas')}${metric(m.interviews, 'Em entrevista')}</div>
     <div class="two-col">
-      <section class="card bill"><h2>Fatura estimada deste mês</h2>
+      <section class="card bill"><h2>Fatura estimada do mês</h2>
         <p class="bill-total">${money(m.bill)}</p>
         <p class="muted">${plural(m.active, 'estagiário ativo', 'estagiários ativos')} × ${money(D.PRICE.intern)}. Inclui termo digital, controle de jornada e relatórios.</p>
         <p class="muted small">Publicar vagas e receber candidaturas é gratuito. Você só paga por estagiário com termo assinado.</p></section>
@@ -274,39 +283,41 @@ function empresaPainel() {
 function empresaVagas() {
   const jobs = D.employerJobs(state), apps = employerApps();
   return pageHead('Empresa', 'Minhas vagas', 'Publique uma vez e alcance alunos de várias faculdades.', '<button type="button" class="btn primary" data-action="new-job">Publicar vaga</button>') +
-    (jobs.length ? `<div class="stack">${jobs.map(j => {
+    (jobs.length ? `<div class="card list">${jobs.map(j => {
       const n = apps.filter(a => a.vacancyId === j.id).length, open = j.status === 'open';
-      return `<article class="card vac-row${open ? '' : ' is-closed'}"><div class="grow"><div class="row-title"><h2 class="h3">${esc(j.title)}</h2><span class="chip ${open ? 'ok' : 'off'}">${open ? 'Aberta' : 'Encerrada'}</span></div>
-        ${jobTags(j)}<p class="muted small">${esc(j.course)} · faculdades: ${esc(j.institutionIds.map(x => instById(x)?.shortName).filter(Boolean).join(', '))} · ${money(j.salary)}/mês</p></div>
+      return `<article class="vac-row${open ? '' : ' is-closed'}"><div class="grow"><div class="row-title"><h2 class="h3">${esc(j.title)}</h2><span class="chip ${open ? 'ok' : 'off'}">${open ? 'Aberta' : 'Encerrada'}</span></div>
+        <p class="muted small">${esc(jobMeta(j))} · ${money(j.salary)}/mês</p><p class="muted small">${esc(j.course)} · ${esc(j.institutionIds.map(x => instById(x)?.shortName).filter(Boolean).join(', '))}</p></div>
         <div class="row-actions"><button type="button" class="btn small" data-action="see-candidates" data-id="${esc(j.id)}">${plural(n, 'candidato', 'candidatos')}</button><button type="button" class="btn small ghost" data-action="toggle-status" data-id="${esc(j.id)}">${open ? 'Encerrar' : 'Reabrir'}</button></div></article>`;
     }).join('')}</div>` : empty('Nenhuma vaga publicada', 'Publique a primeira vaga para receber candidaturas.'));
 }
 
+const BOARD_CAP = 5;
 function empresaCandidatos() {
   const jobs = D.employerJobs(state);
   if (ui.board && !jobs.some(j => j.id === ui.board)) ui.board = '';
-  const apps = employerApps().filter(a => !ui.board || a.vacancyId === ui.board);
+  const apps = employerApps().filter(a => !ui.board || a.vacancyId === ui.board).sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
   const card = a => {
     const s = studentById(a.studentId), j = job(a.vacancyId), recs = recommenders(a.studentId, a.vacancyId), idx = D.stages.indexOf(a.stage), closed = j?.status !== 'open';
     const it = state.internships.find(x => x.applicationId === a.id);
+    const chips = [recs.length ? `<span class="chip rec">${ICON.star}Indicado por ${esc(recs.join(', '))}</span>` : '', it ? statusChip(it) : ''].join('');
     return `<article class="card cand">
-      <div class="cand-head">${avatar(s?.name)}<div><h3>${esc(s?.name)}</h3><p>${esc(s?.course)} · ${s?.semester}º sem. · ${esc(instById(s?.institutionId)?.shortName)}</p></div></div>
+      <h3>${esc(s?.name)}</h3><p class="cand-sub">${esc(s?.course)} · ${s?.semester}º sem. · ${esc(instById(s?.institutionId)?.shortName)}</p>
       <p class="cand-job">${esc(j?.title)}</p>
-      ${recs.length ? `<p class="chip rec">${ICON.star}Indicado por ${esc(recs.join(', '))}</p>` : ''}
-      ${it ? `<div class="cand-termo">${statusChip(it)}</div>` : ''}
-      <label class="field compact"><span>Etapa</span><select data-change="stage" data-id="${esc(a.id)}"${closed ? ' disabled' : ''}>${opts(D.stages, a.stage)}</select></label>
+      ${chips ? `<div class="chips">${chips}</div>` : ''}
       ${closed ? '<p class="muted small">Vaga encerrada: reabra para mover.</p>' : idx < D.stages.length - 1 ? `<button type="button" class="btn small block${idx === 2 ? ' primary' : ''}" data-action="advance" data-id="${esc(a.id)}">${idx === 2 ? 'Contratar e gerar termo' : `Avançar para ${esc(D.stages[idx + 1])}`}</button>` : ''}
+      <label class="move"><span>Etapa</span><select data-change="stage" data-id="${esc(a.id)}"${closed ? ' disabled' : ''}>${opts(D.stages, a.stage)}</select></label>
     </article>`;
   };
   return pageHead('Empresa', 'Candidatos', 'Ao contratar, o termo de estágio é gerado e enviado ao aluno e à faculdade.') +
     `<div class="toolbar card"><label class="field"><span>Vaga</span><select data-change="board">${opts([['', 'Todas as vagas'], ...jobs.map(j => [j.id, `${j.title}${j.status === 'open' ? '' : ' (encerrada)'}`])], ui.board)}</select></label><p class="muted">${plural(apps.length, 'candidatura', 'candidaturas')}</p></div>
-    <div class="board">${D.stages.map(st => { const list = apps.filter(a => a.stage === st); return `<section class="column" aria-label="${esc(st)}"><h2 class="column-head">${esc(st)} <span class="count-pill">${list.length}</span></h2>${list.map(card).join('') || '<p class="column-empty">Ninguém nesta etapa.</p>'}</section>`; }).join('')}</div>`;
+    <div class="board">${D.stages.map(st => { const list = apps.filter(a => a.stage === st), shown = ui.boardMore[st] ? list : list.slice(0, BOARD_CAP);
+      return `<section class="column" aria-label="${esc(st)}"><h2 class="column-head">${esc(st)} <span class="count-pill">${list.length}</span></h2>${shown.map(card).join('') || '<p class="column-empty">Ninguém nesta etapa.</p>'}${list.length > shown.length ? `<button type="button" class="btn small more" data-action="board-more" data-id="${esc(st)}">Mostrar mais ${list.length - shown.length}</button>` : ''}</section>`; }).join('')}</div>`;
 }
 
 function empresaEstagiarios() {
   const list = state.internships.filter(it => it.companyId === D.currentCompanyId(state)).sort((a, b) => String(b.start).localeCompare(String(a.start)));
   return pageHead('Empresa', 'Estagiários', 'Termos, jornada e relatórios de cada estagiário, sem papel.') +
-    (list.length ? `<div class="stack">${list.map(it => internshipCard(it, 'empresa')).join('')}</div>` : empty('Nenhum estagiário ainda', 'Quando você contratar alguém pela rede, o estágio aparece aqui.'));
+    (list.length ? `<div class="card list">${list.map(it => internshipCard(it, 'empresa')).join('')}</div>` : empty('Nenhum estagiário ainda', 'Quando você contratar alguém pela rede, o estágio aparece aqui.'));
 }
 
 function jobForm() {
@@ -352,25 +363,26 @@ function jobCard(x, s) {
   const j = x.job, c = company(j.companyId), app = appFor(j.id, s.id), rec = recommenders(s.id, j.id).length, why = reasons(x);
   const chips = [app ? `<span class="chip ok">${ICON.check}${esc(app.stage)}</span>` : '', rec ? `<span class="chip rec">${ICON.star}Indicada pela faculdade</span>` : '', x.compatible && !app ? '<span class="chip info">Compatível com você</span>' : ''].join('');
   return `<article class="card job-card${x.compatible ? '' : ' dim'}">
-    <div class="job-head">${logo(c)}<div class="job-title"><h3><a href="#/aluno/vaga/${esc(j.id)}">${esc(j.title)}</a></h3><p>${esc(c.name)} · ${esc(j.location)}</p></div></div>
-    ${jobTags(j)}
-    ${why.length ? `<p class="why">${esc(why.join(' · '))}</p>` : ''}
-    <div class="job-foot"><p class="salary"><strong>${money(j.salary)}</strong> /mês</p>${chips}</div>
+    ${logo(c)}
+    <div><h3><a href="#/aluno/vaga/${esc(j.id)}">${esc(j.title)}</a></h3><p class="job-org">${esc(c.name)} · ${esc(j.location)}</p><p class="job-meta">${esc(jobMeta(j))}</p>${why.length ? `<p class="why">${esc(why.join(' · '))}</p>` : ''}</div>
+    <div class="job-side"><p class="salary"><strong>${money(j.salary)}</strong> /mês</p>${chips ? `<div class="chips">${chips}</div>` : ''}</div>
   </article>`;
 }
-const countText = () => { const n = filteredJobs().length; return n === 1 ? '1 vaga' : `${n} vagas`; };
+const countText = () => { const n = filteredJobs().length; return `${n === 1 ? '1 vaga' : `${n} vagas`}${ui.onlyCompatible ? ' compatíveis com você' : ' na rede'}`; };
 function resultsHtml() {
   const list = filteredJobs(), s = student();
   if (!list.length) return empty('Nenhuma vaga com esses filtros', 'Desmarque “só compatíveis” ou limpe os filtros para ver todas as vagas da rede.', '<button type="button" class="btn primary" data-action="clear-filters">Limpar filtros</button>');
-  return `<div class="grid jobs">${list.map(x => jobCard(x, s)).join('')}</div>`;
+  return `<div class="jobs">${list.map(x => jobCard(x, s)).join('')}</div>`;
 }
 function alunoVagas() {
   const s = student(), i = inst(), all = D.jobsForStudent(state, s), comp = all.filter(x => x.compatible).length;
-  return `<section class="hero">
-      <div class="hero-text"><p class="eyebrow">${esc(D.portalName(i))}</p>
+  return `<section class="hero card">
+      <div><p class="eyebrow">${esc(D.portalName(i))}</p>
         <h1 tabindex="-1">Olá, ${esc(firstName(s.name))}. Pedem experiência para te dar experiência? Aqui não.</h1>
-        <p class="lead">${plural(comp, 'vaga combina', 'vagas combinam')} com o seu curso, o seu semestre e o seu horário de aula.</p></div>
-      <dl class="hero-stats"><div><dt>Vagas na rede</dt><dd>${all.length}</dd></div><div><dt>Compatíveis</dt><dd>${comp}</dd></div><div><dt>Candidaturas</dt><dd>${state.applications.filter(a => a.studentId === s.id).length}</dd></div></dl>
+        <p class="lead">${comp ? `<strong>${plural(comp, 'vaga combina', 'vagas combinam')}</strong> com você` : 'Ainda não há vagas compatíveis com você'}, entre ${plural(all.length, 'vaga aberta', 'vagas abertas')} na rede de faculdades.</p></div>
+      <aside class="hero-profile" aria-label="Seu perfil de busca"><p class="eyebrow">Combinamos as vagas com</p>
+        <dl><div><dt>Curso</dt><dd>${esc(s.course)}</dd></div><div><dt>Semestre</dt><dd>${s.semester}º</dd></div><div><dt>Aula</dt><dd>${esc(s.shift)}</dd></div></dl>
+        <a href="#/aluno/perfil">Ver meu perfil</a></aside>
     </section>
     <form class="filters card" role="search" aria-label="Filtrar vagas" data-form="filters">
       <label class="field grow"><span>Buscar</span><input type="search" data-filter="q" value="${esc(ui.q)}" placeholder="Cargo, empresa ou cidade" maxlength="80" autocomplete="off"></label>
@@ -378,7 +390,7 @@ function alunoVagas() {
       <label class="field"><span>Modalidade</span><select data-filter="mode"><option value="">Todas</option>${opts(D.modes, ui.mode)}</select></label>
       <label class="check filter-check"><input type="checkbox" data-filter="onlyCompatible"${ui.onlyCompatible ? ' checked' : ''}><span>Só compatíveis comigo</span></label>
     </form>
-    <p class="count" id="count" aria-live="polite">${countText()} · ${esc(s.course)}, ${s.semester}º semestre, aula de ${esc(s.shift.toLowerCase())}</p>
+    <p class="count" id="count" aria-live="polite">${countText()}</p>
     <div id="results">${resultsHtml()}</div>`;
 }
 function alunoVaga(id) {
@@ -389,16 +401,16 @@ function alunoVaga(id) {
   const facts = [['Curso', j.course], ['Semestre mínimo', `${j.minSemester}º`], ['Carga horária', `${j.hours} horas por semana`], ['Turno', j.shift], ['Modalidade', j.mode], ['Local', j.location], j.supervisor ? ['Supervisão', j.supervisor] : null, ['Publicada em', fmtDate(j.createdAt)]].filter(Boolean);
   return `${back}<div class="detail">
     <article class="card detail-main">
-      <header class="detail-head">${logo(c, 'lg')}<div><p class="eyebrow">${esc(c.name)} · ${esc(c.sector)}</p><h1 tabindex="-1">${esc(j.title)}</h1>${jobTags(j)}</div></header>
+      <header class="detail-head">${logo(c, 'lg')}<div><p class="eyebrow">${esc(c.name)} · ${esc(c.sector)}</p><h1 tabindex="-1">${esc(j.title)}</h1><p class="muted">${esc([j.location, j.location === j.mode ? '' : j.mode, `${j.hours}h por semana`].filter(Boolean).join(' · '))}</p></div></header>
       ${recs.length ? `<p class="callout">${ICON.star}<span>A ${esc(recs.join(', '))} indicou você para esta vaga.</span></p>` : ''}
       ${why.length ? `<p class="callout warn">${ICON.alert}<span>Atenção: ${esc(why.join(' · '))}.</span></p>` : `<p class="callout ok">${ICON.check}<span>Compatível com o seu curso, semestre e horário de aula.</span></p>`}
       <h2>Sobre a vaga</h2><p class="prose">${esc(j.description)}</p>
       <h2>Benefícios</h2><ul class="checks">${(j.benefits || []).map(b => `<li>${ICON.check}${esc(b)}</li>`).join('')}</ul>
       <h2>Detalhes</h2><dl class="facts">${facts.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>
     </article>
-    <aside class="card detail-side" aria-label="Candidatura"><p class="salary big"><strong>${money(j.salary)}</strong> /mês</p>
+    <aside class="card detail-side${app ? '' : ' cta'}" aria-label="Candidatura"><p class="salary big"><strong>${money(j.salary)}</strong> /mês</p>
       ${app ? `<div class="applied"><p class="ok-line">${ICON.check}Candidatura enviada em ${esc(fmtDate(app.createdAt))}</p>${stepper(app.stage)}<a href="#/aluno/candidaturas">Acompanhar candidaturas</a></div>`
-        : `<button type="button" class="btn primary block" data-action="apply" data-id="${esc(j.id)}">Candidatar-me</button><p class="hint">Seu perfil (${esc(s.name)}, ${esc(s.course)}, ${s.semester}º semestre) vai para ${esc(c.name)} com o selo da ${esc(i.shortName)}.</p>`}
+        : `<button type="button" class="btn primary block big" data-action="apply" data-id="${esc(j.id)}">Candidatar-me</button><p class="hint">Seu perfil (${esc(s.name)}, ${esc(s.course)}, ${s.semester}º semestre) vai para ${esc(c.name)} com o selo da ${esc(i.shortName)}.</p>`}
     </aside></div>`;
 }
 function alunoCandidaturas() {
@@ -446,7 +458,7 @@ function ajuda() {
       <div><dt>Aluno</dt><dd>Nunca paga.</dd></div></dl>
       <p class="muted small">Faculdades, empresas e pessoas são fictícias. Assinaturas e documentos são simulados.</p></section></div>
     <section class="card"><h2>Seus dados</h2><p>${storageOk ? 'As alterações ficam salvas apenas neste navegador.' : 'Este navegador bloqueou o armazenamento: as alterações valem só até fechar a aba.'}</p>
-      <button type="button" class="btn danger" data-action="reset">Restaurar dados de exemplo</button></section>`;
+      <button type="button" class="btn danger-ghost" data-action="reset">Restaurar dados de exemplo</button></section>`;
 }
 
 /* ---------- roteamento ---------- */
@@ -466,17 +478,19 @@ function render() {
   else { location.replace(home(state.context.role)); return; }
   const i = inst();
   document.documentElement.style.setProperty('--accent', activeRole === 'empresa' ? '#245847' : safeAccent(i.accent));
+  document.body.dataset.area = activeRole === 'aluno' && activePage !== 'ajuda' ? 'aluno' : 'gestao';
   document.title = `${activePage === 'ajuda' ? 'Ajuda' : NAV[activeRole].find(n => n[0] === activePage)?.[1] || 'Vaga'} · Oportuniza Rede`;
   const sub = activeRole === 'empresa' ? `${myCompany().name} · rede de ${state.institutions.length} faculdades` : D.portalName(i);
   $('#app').innerHTML = `
     <header class="topbar"><div class="wrap topbar-inner">
       <a class="brand" href="${home(activeRole)}"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M11 25V15h10m-4 14 12-12m-9-2h9v9"/></svg></span><span class="brand-text"><strong>Oportuniza Rede</strong><small>${esc(sub)}</small></span></a>
       <span class="demo-badge" title="Dados fictícios">Demonstração</span>
+      <a class="icon-btn help-top" href="#/ajuda" aria-label="Roteiro e ajuda"${activePage === 'ajuda' ? ' aria-current="page"' : ''}>${ICON.help}</a>
       <div class="controls">
         <nav class="persona" aria-label="Ver como">${Object.keys(NAV).map(r => `<a href="${home(r)}"${r === activeRole && activePage !== 'ajuda' ? ' aria-current="true"' : ''}>${ROLE_LABEL[r]}</a>`).join('')}</nav>
         ${activeRole === 'empresa' ? `<label class="inst-select"><span class="sr-only">Empresa</span><select data-change="company" aria-label="Empresa">${opts(state.companies.map(x => [x.id, x.name]), D.currentCompanyId(state))}</select></label>` : `<label class="inst-select"><span class="sr-only">Faculdade</span><select data-change="institution" aria-label="Faculdade">${opts(state.institutions.map(x => [x.id, x.shortName]), i.id)}</select></label>`}
       </div></div>
-      <nav class="tabs" aria-label="Seções"><div class="wrap tabs-inner">${NAV[activeRole].map(([p, label]) => `<a href="#/${activeRole}/${p}"${activePage === p ? ' aria-current="page"' : ''}>${label}</a>`).join('')}<a href="#/ajuda" class="help-link"${activePage === 'ajuda' ? ' aria-current="page"' : ''}>Roteiro e ajuda</a></div></nav>
+      <nav class="tabs" aria-label="Seções"><div class="wrap tabs-inner">${NAV[activeRole].map(([p, label, short, icon]) => `<a href="#/${activeRole}/${p}"${activePage === p ? ' aria-current="page"' : ''}>${ICON[icon]}<span class="long">${label}</span><span class="short" aria-hidden="true">${short}</span></a>`).join('')}<a href="#/ajuda" class="help-link"${activePage === 'ajuda' ? ' aria-current="page"' : ''}>Roteiro e ajuda</a></div></nav>
     </header>
     ${storageOk ? '' : '<p class="storage-note wrap" role="note">O navegador bloqueou o armazenamento local. As alterações serão perdidas ao fechar a aba.</p>'}
     <main id="main" class="wrap" tabindex="-1">${html}</main>
@@ -511,19 +525,20 @@ const ACTIONS = {
   termo: ({ id }) => termoDialog(id),
   recommend: ({ id }) => openModal(recommendForm(id)),
   'more-talents': () => { ui.talentLimit += 20; render(); },
+  'board-more': ({ id }) => { ui.boardMore[id] = true; render(); },
   invite: () => openModal(`<form class="modal-card form" data-form="invite">${modalHead('Convidar empresa para a rede')}<div class="modal-body"><p>A empresa recebe um convite para publicar vagas para os seus alunos. Publicar é gratuito.</p>
     <label class="field"><span>Nome da empresa</span><input name="name" required maxlength="80" autofocus></label><label class="field"><span>E-mail do RH</span><input name="email" type="email" required maxlength="120"></label></div>
     <footer class="modal-foot"><button type="button" class="btn ghost" data-action="close-modal">Cancelar</button><button type="submit" class="btn primary">Enviar convite</button></footer></form>`),
   'set-plan': ({ plan }) => mutate(s => D.setPlan(s, inst().id, plan), r => `Plano alterado para ${r.plan === 'gestao' ? 'Gestão' : 'Essencial'} (simulação).`),
   export: () => { download(`empregabilidade-${inst().shortName.toLowerCase().replace(/\s+/g, '-')}-${now()}.csv`, D.employabilityCSV(state, inst().id, now())); toast('Relatório de empregabilidade exportado (CSV).'); },
   reset: () => openModal(`<div class="modal-card">${modalHead('Restaurar dados de exemplo?')}<div class="modal-body"><p>Tudo o que foi feito nesta demonstração será apagado deste navegador.</p></div><footer class="modal-foot"><button type="button" class="btn ghost" data-action="close-modal" autofocus>Cancelar</button><button type="button" class="btn danger" data-action="confirm-reset">Restaurar</button></footer></div>`),
-  'confirm-reset': () => { state = D.seed(); Object.assign(ui, { q: '', type: '', mode: '', onlyCompatible: true, board: '', talentCourse: '', talentFree: false, talentLimit: 20, estStatus: '' }); persist(); closeModal(); if (location.hash === home('faculdade')) render(); else location.hash = home('faculdade'); toast('Dados de exemplo restaurados.'); },
+  'confirm-reset': () => { state = D.seed(); Object.assign(ui, { q: '', type: '', mode: '', onlyCompatible: true, board: '', talentCourse: '', talentFree: false, talentLimit: 20, estStatus: '', boardMore: {} }); persist(); closeModal(); if (location.hash === home('faculdade')) render(); else location.hash = home('faculdade'); toast('Dados de exemplo restaurados.'); },
 };
 
 const CHANGES = {
   institution: v => { state.context.institutionId = v; persist(); render(); toast(`Visualizando ${inst().shortName}.`); },
-  company: v => { state.context.companyId = v; ui.board = ''; persist(); render(); toast(`Visualizando ${myCompany().name}.`); },
-  board: v => { ui.board = v; render(); $('[data-change="board"]')?.focus(); },
+  company: v => { state.context.companyId = v; ui.board = ''; ui.boardMore = {}; persist(); render(); toast(`Visualizando ${myCompany().name}.`); },
+  board: v => { ui.board = v; ui.boardMore = {}; render(); $('[data-change="board"]')?.focus(); },
   estStatus: v => { ui.estStatus = v; render(); $('[data-change="estStatus"]')?.focus(); },
   talentCourse: v => { ui.talentCourse = v; ui.talentLimit = 20; render(); $('[data-change="talentCourse"]')?.focus(); },
   talentFree: (v, d, el) => { ui.talentFree = el.checked; ui.talentLimit = 20; render(); $('[data-change="talentFree"]')?.focus(); },
@@ -577,7 +592,7 @@ function onFilter(t) {
   const k = t.dataset.filter, v = t.type === 'checkbox' ? t.checked : t.value;
   if (ui[k] === v) return; ui[k] = v;
   $('#results').innerHTML = resultsHtml();
-  const s = student(); $('#count').textContent = `${countText()} · ${s.course}, ${s.semester}º semestre, aula de ${s.shift.toLowerCase()}`;
+  $('#count').textContent = countText();
 }
 
 window.addEventListener('hashchange', render);
