@@ -148,7 +148,7 @@ p { margin: 0; font-size: 30px; }
 .ask { display: grid; grid-template-columns: 1.1fr 1fr; gap: 32px; }
 .ask .card h3 { color: #F1EEE4; }
 .ask .card p { font-size: 26px; color: var(--soft-dark); }
-.ask .big { font-family: 'Fraunces', Georgia, serif; font-size: 96px; font-weight: 600; color: var(--lime); line-height: 1; }
+.ask .card .big { font-family: 'Fraunces', Georgia, serif; font-size: 96px; font-weight: 600; color: var(--lime); line-height: 1; }
 
 /* time */
 .team { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 28px; }
@@ -158,6 +158,22 @@ p { margin: 0; font-size: 30px; }
 .member .role { font-size: 26px; font-weight: 600; color: var(--green); }
 .member p { font-size: 24px; color: var(--soft); }
 .close { font-family: 'Fraunces', Georgia, serif; font-size: 64px; line-height: 1.1; font-weight: 600; color: var(--green); }
+
+/* piloto */
+.pilot { display: grid; grid-template-columns: 1fr 620px; gap: 64px; align-items: start; }
+.psteps { display: flex; flex-direction: column; gap: 20px; }
+.pstep { display: flex; gap: 24px; align-items: flex-start; border-top: 2px solid var(--line); padding-top: 20px; }
+.pstep .n { flex: none; width: 48px; font-family: 'Fraunces', Georgia, serif; font-size: 48px; font-weight: 600; color: var(--green); line-height: 1; }
+.pstep .body { display: flex; flex-direction: column; gap: 6px; }
+.pstep .k { font-size: 24px; font-weight: 600; letter-spacing: 0.1em; color: var(--green); }
+.pstep .body p.d { font-size: 28px; color: var(--ink); }
+.funds { background: var(--deep); border-radius: 24px; padding: 36px 40px; display: flex; flex-direction: column; gap: 12px; }
+.funds .k { font-size: 24px; font-weight: 600; letter-spacing: 0.1em; color: var(--lime); }
+.funds .big { font-family: 'Fraunces', Georgia, serif; font-size: 88px; font-weight: 600; color: var(--lime); line-height: 1; }
+.funds .d { font-size: 26px; color: var(--soft-dark); }
+.funds .d b { color: #F1EEE4; }
+.funds .sep { border-top: 2px solid #2F5447; margin: 8px 0 4px; }
+.dark .close { color: var(--lime); font-size: 52px; }
 
 /* capa */
 .cover-mark { width: 120px; height: 120px; border-radius: 32px; background: var(--lime); display: flex; align-items: center; justify-content: center; }

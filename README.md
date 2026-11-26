@@ -80,4 +80,4 @@ npm test
 
 A primeira versão foi recuperada de um backup incompleto e reconstruída a partir de `specs/001-oportuniza-rede/`.
 A versão atual (v2) reflete o novo modelo de negócio: rede nacional de faculdades, termo de estágio tripartite, relatórios semestrais, indicadores para a faculdade e cobrança por estagiário ativo.
-A análise de mercado e os materiais do pitch ficam em `docs/`.
+Os documentos de entrega ficam em `docs/entrega/`: Plano de Negócios (PDF e Word), Business Model Canvas e apresentação do pitch (PDF). A versão anterior do visual do MVP está na branch `design-antigo`.
