@@ -161,7 +161,8 @@ def caption_block(kind, title, call, fonte):
     captions.append((kind, n, title))
     if LAST['p'] is not None:  # a chamada entra no fim do parágrafo anterior (economiza linhas)
         r = LAST['p'].add_run(' ' + call.format(n=n)); set_font(r, 12, False)
-        LAST['p'].paragraph_format.keep_with_next = True
+        # parágrafo longo não desce inteiro junto com o quadro (evita página com espaço em branco)
+        LAST['p'].paragraph_format.keep_with_next = len(LAST['p'].text) < 200
     else:
         para(call.format(n=n), keep=True)
     LAST['p'] = None

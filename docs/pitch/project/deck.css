@@ -139,6 +139,11 @@ p { margin: 0; font-size: 30px; }
 .yrs p { flex: 1; text-align: center; font-size: 26px; font-weight: 600; }
 .legend { display: flex; gap: 32px; font-size: 24px; color: var(--soft); }
 .sw { display: inline-block; width: 24px; height: 24px; border-radius: 4px; }
+.chart.four .bars, .chart.four .yrs { gap: 32px; }
+.chart.four .bar, .chart.four .val { width: 76px; }
+.yr.now { background: #EAF1EC; border-radius: 16px 16px 0 0; }
+.yrs p.now { color: var(--ink); }
+.yrs .gain { display: block; color: var(--green); font-size: 24px; }
 .kpis { display: flex; flex-direction: column; gap: 28px; width: 620px; }
 .kpi .v { font-family: 'Fraunces', Georgia, serif; font-size: 64px; font-weight: 600; color: var(--green); line-height: 1.05; }
 .kpi p { font-size: 26px; color: var(--soft); }
