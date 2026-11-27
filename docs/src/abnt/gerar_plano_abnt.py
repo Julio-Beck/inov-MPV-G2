@@ -114,7 +114,6 @@ def shift_secoes(t):
 REPL = [  # (trecho do original, substituto) — citações no texto (NBR 10520:2023)
     ('desemprego de 18 a 24 anos no dobro da média nacional', 'desemprego de 18 a 24 anos no dobro da média nacional (Vargas, 2024)'),
     ('controla a jornada máxima de 30 horas semanais', 'controla a jornada máxima de 30 horas semanais (Brasil, 2008)'),
-    ('o edital é da FAPERGS)', 'o edital é da FAPERGS; FAPERGS, 2025)'),
     ('(repositório)', '(Oportuniza Rede, 2026)'),
 ]
 used = {k: 0 for k, _ in REPL}
@@ -131,19 +130,22 @@ CAP = {  # índice da tabela no original -> (tipo, título, frase de chamada, fo
     1: ('Quadro', 'Dados da empresa', 'O Quadro {n} apresenta a forma jurídica e os dados de registro previstos.', 'Elaborado pelos autores (2026).'),
     2: ('Quadro', 'Papéis na sociedade', 'O Quadro {n} apresenta os papéis na sociedade.', 'Elaborado pelos autores (2026).'),
     3: ('Quadro', 'Produtos e serviços por perfil e situação no MVP', 'O Quadro {n} detalha o que a plataforma entrega a cada perfil e o que já está no MVP.', 'Elaborado pelos autores (2026).'),
-    4: ('Quadro', 'Segmentos de clientes', 'O Quadro {n} apresenta os segmentos de clientes.', 'Elaborado pelos autores (2026), com base em INEP (2026), Vargas (2024) e Ensino... (2026).'),
-    5: ('Tabela', 'Tamanho de mercado com os preços da seção 4', 'A Tabela {n} apresenta o tamanho de mercado.', 'Elaborado pelos autores (2026), com base em INEP (2026) e Vargas (2024).'),
-    6: ('Quadro', 'Principais concorrentes', 'O Quadro {n} compara os principais concorrentes.', 'Elaborado pelos autores (2026), com base em Retenção... (2026), Super... (2025), Peçanha (2018) e Brazilian... (2025).'),
-    7: ('Quadro', 'Composto de marketing (4 Ps)', 'O Quadro {n} apresenta a estratégia para cada um dos 4 Ps.', 'Elaborado pelos autores (2026).'),
-    8: ('Tabela', 'Metas comerciais de 2027 a 2029', 'A Tabela {n} apresenta as metas comerciais.', 'Elaborado pelos autores (2026).'),
-    9: ('Quadro', 'Tecnologia e segurança', 'O Quadro {n} resume as decisões de tecnologia e segurança.', 'Elaborado pelos autores (2026), com base em Brasil (2018).'),
-    10: ('Quadro', 'Capacidade e equipe de 2027 a 2029', 'O Quadro {n} apresenta a evolução da equipe. A premissa de capacidade é que uma pessoa de sucesso do cliente atende até 20 faculdades, hipótese a medir no piloto.', 'Elaborado pelos autores (2026).'),
-    11: ('Tabela', 'Demonstração do resultado projetada de 2027 a 2029 (R$ mil)', 'A Tabela {n} apresenta a demonstração do resultado projetada.', 'Elaborado pelos autores (2026).'),
-    12: ('Tabela', 'Uso do investimento de R$ 600 mil', 'A Tabela {n} apresenta o uso do investimento necessário.', 'Elaborado pelos autores (2026).'),
-    13: ('Quadro', 'Indicadores financeiros estimados (hipóteses)', 'O Quadro {n} apresenta os indicadores financeiros estimados.', 'Elaborado pelos autores (2026).'),
-    14: ('Quadro', 'Cenários para o fim de 2029', 'O Quadro {n} compara três cenários.', 'Elaborado pelos autores (2026).'),
-    15: ('Quadro', 'Riscos principais e respostas', 'O Quadro {n} apresenta os riscos principais e as respostas previstas.', 'Elaborado pelos autores (2026).'),
-    16: ('Tabela', 'Investimento do piloto em 2027 (R$ mil)', 'A Tabela {n} detalha o investimento do piloto.', 'Elaborado pelos autores (2026).'),
+    4: ('Quadro', 'O que a faculdade ganha com a plataforma', 'O Quadro {n} resume o que a faculdade ganha e o dado que sustenta cada ponto.', 'Elaborado pelos autores (2026), com base em Brasil (2008), O Sinaes... ([20--]) e Estágio... (2025).'),
+    5: ('Tabela', 'Preço por estagiário ativo por mês: referências de mercado', 'A Tabela {n} compara o preço com essas referências.', 'Elaborado pelos autores (2026), com base em CIEE/PR ([2026]), Quanto... (2025), Santa Catarina (2026), Conselho Federal de Enfermagem (2026) e Tribunal Regional Eleitoral de Rondônia (2025).'),
+    6: ('Tabela', 'Efeito do preço por estagiário no ponto de equilíbrio', 'A Tabela {n} mostra como o preço muda o número de faculdades necessárias para o equilíbrio.', 'Elaborado pelos autores (2026).'),
+    7: ('Quadro', 'Segmentos de clientes', 'O Quadro {n} apresenta os segmentos de clientes.', 'Elaborado pelos autores (2026), com base em INEP (2026), Vargas (2024) e Ensino... (2026).'),
+    8: ('Tabela', 'Tamanho de mercado com os preços da seção 4', 'A Tabela {n} apresenta o tamanho de mercado.', 'Elaborado pelos autores (2026), com base em INEP (2026) e Vargas (2024).'),
+    9: ('Quadro', 'Principais concorrentes', 'O Quadro {n} compara os principais concorrentes.', 'Elaborado pelos autores (2026), com base em Retenção... (2026), Super... (2025), Peçanha (2018) e Brazilian... (2025).'),
+    10: ('Quadro', 'Composto de marketing (4 Ps)', 'O Quadro {n} apresenta a estratégia para cada um dos 4 Ps.', 'Elaborado pelos autores (2026).'),
+    11: ('Tabela', 'Metas comerciais de 2027 a 2029', 'A Tabela {n} apresenta as metas comerciais.', 'Elaborado pelos autores (2026).'),
+    12: ('Quadro', 'Tecnologia e segurança', 'O Quadro {n} resume as decisões de tecnologia e segurança.', 'Elaborado pelos autores (2026), com base em Brasil (2018).'),
+    13: ('Quadro', 'Capacidade e equipe de 2027 a 2029', 'O Quadro {n} apresenta a evolução da equipe. A premissa de capacidade é que uma pessoa de sucesso do cliente atende até 20 faculdades, hipótese a medir no piloto.', 'Elaborado pelos autores (2026).'),
+    14: ('Tabela', 'Demonstração do resultado projetada de 2027 a 2029 (R$ mil)', 'A Tabela {n} apresenta a demonstração do resultado projetada.', 'Elaborado pelos autores (2026).'),
+    15: ('Tabela', 'Uso do investimento de R$ 600 mil, por etapa (R$ mil)', 'A Tabela {n} mostra onde entra cada real do investimento, em cada etapa.', 'Elaborado pelos autores (2026), com base na Tabela 5 e no Quadro 10.'),
+    16: ('Quadro', 'Indicadores financeiros estimados (hipóteses)', 'O Quadro {n} apresenta os indicadores financeiros estimados.', 'Elaborado pelos autores (2026).'),
+    17: ('Quadro', 'Cenários para o fim de 2029', 'O Quadro {n} compara três cenários.', 'Elaborado pelos autores (2026).'),
+    18: ('Quadro', 'Riscos principais e respostas', 'O Quadro {n} apresenta os riscos principais e as respostas previstas.', 'Elaborado pelos autores (2026).'),
+    19: ('Tabela', 'Investimento do piloto em 2027 (R$ mil)', 'A Tabela {n} detalha o investimento do piloto e o que cada valor paga.', 'Elaborado pelos autores (2026).'),
 }
 # parágrafos-rótulo do original que viram título de quadro/tabela (são descartados)
 LABELS = ('Papéis na sociedade', 'Clientes:', 'Tamanho de mercado', 'Concorrentes:', 'Os 4 Ps:', 'Metas comerciais:',
@@ -220,7 +222,7 @@ def copy_table(src_tbl, kind):
     t._tbl.tblPr.append(mar)
     for i, row in enumerate(t.rows):  # linhas não se partem; quadros pequenos ficam inteiros na mesma página
         trPr = row._tr.get_or_add_trPr(); cs = OxmlElement('w:cantSplit'); cs.set(qn('w:val'), 'true'); trPr.append(cs)
-        if rows <= 12 and i < rows - 1:
+        if rows <= 12:  # inclusive a última linha, que fica presa à linha de fonte
             for c in row.cells:
                 for cp in c.paragraphs: cp.paragraph_format.keep_with_next = True
     return t
@@ -385,13 +387,21 @@ REFS = [
     [('BRASIL. ', False), ('Lei nº 11.788, de 25 de setembro de 2008', True), ('. Dispõe sobre o estágio de estudantes. Brasília, DF: Presidência da República, 2008. Texto atualizado disponível em: https://www2.camara.leg.br/legin/fed/lei/2008/lei-11788-25-setembro-2008-581200-normaatualizada-pl.html. ' + ACESSO, False)],
     [('BRASIL. ', False), ('Lei nº 13.709, de 14 de agosto de 2018', True), ('. Lei Geral de Proteção de Dados Pessoais (LGPD). Brasília, DF: Presidência da República, 2018. Disponível em: https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm. ' + ACESSO, False)],
     [('BRAZILIAN fintech Pravaler buys edtech Workalove and increases solutions for education. ', False), ('LatamFintech', True), (', [S. l.], 3 jun. 2025. Disponível em: https://www.latamfintech.co/articles/brazilian-fintech-pravaler-buys-edtech-workalove-and-increases-solutions-for-education. ' + ACESSO, False)],
+    [('CENTRO DE INTEGRAÇÃO EMPRESA-ESCOLA DO PARANÁ (CIEE/PR). ', False), ('Perguntas e respostas', True), (': unidades concedentes. Curitiba: CIEE/PR, [2026]. Disponível em: https://autoweb.cieepr.org.br/AutoWeb/frmPERGUNTARESPOSTA.ASPX?tipo=UC. ' + ACESSO, False)],
+    [('CONSELHO FEDERAL DE ENFERMAGEM (COFEN). ', False), ('Termo de julgamento', True), (': Pregão Eletrônico nº 90.001/2026. Brasília, DF: Cofen, 2026. Disponível em: https://www.portalcofen.gov.br/wp-content/uploads/2026/03/Termo-de-Julgamento-Pregao-Eletronico-no-90.001-2026.pdf. ' + ACESSO, False)],
     [('ENSINO superior: mega mantenedoras concentram 47,1% das matrículas de graduação. ', False), ('PEBSP', True), (', [S. l.], 28 abr. 2026. Disponível em: https://www.pebsp.com/?p=47100. ' + ACESSO, False)],
+    [('ESTÁGIO define faculdade para 75% dos estudantes, mostra pesquisa. ', False), ('Educa Mais Brasil', True), (', [S. l.], 2025. Disponível em: https://www.educamaisbrasil.com.br/educacao/noticias/estagio-define-faculdade-para-75-dos-estudantes-mostra-pesquisa. ' + ACESSO, False)],
+    [('FUNDAÇÃO DE AMPARO À PESQUISA DO ESTADO DO RIO GRANDE DO SUL (FAPERGS). ', False), ('Programa Centelha RS', True), (': edital da 2ª edição. Porto Alegre: FAPERGS, 2021. Disponível em: https://programacentelha.com.br/wp-content/uploads/2021/09/RS-Edital-Centelha-2-1.pdf. ' + ACESSO, False)],
     [('FUNDAÇÃO DE AMPARO À PESQUISA DO ESTADO DO RIO GRANDE DO SUL (FAPERGS). ', False), ('Edital FAPERGS 07/2025', True), (': Programa Centelha 3 RS. Porto Alegre: FAPERGS, 2025. Disponível em: https://programacentelha.com.br/wp-content/uploads/2025/10/Edital-Centelha-3-RS-31-10-2025.pdf. ' + ACESSO, False)],
     [('INSTITUTO NACIONAL DE ESTUDOS E PESQUISAS EDUCACIONAIS ANÍSIO TEIXEIRA (INEP). ', False), ('Brasil tem recorde de estudantes na graduação', True), ('. Brasília, DF: Inep, 26 nov. 2026. Disponível em: https://www.gov.br/inep/pt-br/centrais-de-conteudo/noticias/censo-da-educacao-superior/brasil-tem-recorde-de-estudantes-na-graduacao. ' + ACESSO, False)],
+    [('O SINAES e os parâmetros avaliativos do relacionamento com egressos. ', False), ('Sempre UFMG', True), (', Belo Horizonte, [20--]. Disponível em: https://www.ufmg.br/copi/sempreufmg/o-sinaes-e-os-parametros-avaliativos-do-relacionamento-com-egressos/. ' + ACESSO, False)],
     [('OPORTUNIZA REDE. ', False), ('inov-MPV-G2', True), (': MVP da plataforma Oportuniza Rede. [S. l.]: GitHub, 2026. Disponível em: https://github.com/Julio-Beck/inov-MPV-G2. ' + ACESSO, False)],
     [('PEÇANHA, Laryssa. Nube: plataforma de vagas para estágio. Saiba como funciona. ', False), ('B2B Stack', True), (', [S. l.], 11 jan. 2018. Disponível em: https://www.b2bstack.com.br/product/nube. ' + ACESSO, False)],
+    [('QUANTO ganha um estagiário? ', False), ('IstoÉ Dinheiro', True), (', São Paulo, 4 maio 2025. Disponível em: https://istoedinheiro.com.br/quanto-ganha-um-estagiario. ' + ACESSO, False)],
     [('RETENÇÃO de estagiários nas empresas [título atribuído]. ', False), ('Economic News Brasil', True), (', [S. l.], 9 fev. 2026. Disponível em: https://economicnewsbrasil.com.br/2026/02/09/retencao-de-estagiarios-empresas/. ' + ACESSO, False)],
+    [('SANTA CATARINA. ', False), ('Contrato nº 01/2026', True), (': Centro de Integração Empresa-Escola (CIEE). Florianópolis, 2026. Disponível em: https://simaecao.sc.gov.br/pdfs/cont_012026_ciee_assinado.pdf. ' + ACESSO, False)],
     [('SUPER Estágios atinge R$ 164 milhões e prevê 100 unidades até 2025. ', False), ('Mercado&Consumo', True), (', São Paulo, 10 jan. 2025. Disponível em: https://mercadoeconsumo.com.br/10/01/2025/gestao/super-estagios-atinge-r-164-milhoes-e-preve-100-unidades-ate-2025. ' + ACESSO, False)],
+    [('TRIBUNAL REGIONAL ELEITORAL DE RONDÔNIA (TRE-RO). ', False), ('Termo aditivo nº 2', True), (': contrato decorrente do Pregão Eletrônico nº 90002/2024 (agente de integração de estágio). Porto Velho: TRE-RO, 2025. Disponível em: https://www.tre-ro.jus.br/transparencia-e-prestacao-de-contas/licitacoes-e-contratos/integra-dos-termos-aditivos/arquivos-1/tre-ro-t-a-02-pe90002-2024-ct16-20224-public-dje-pncp. ' + ACESSO, False)],
     [('VARGAS, Mônica. ', False), ('Cenário da juventude', True), ('. Apresentação em audiência pública da Comissão de Educação da Câmara dos Deputados. Brasília, DF, 20 jun. 2024. Disponível em: https://www2.camara.leg.br/atividade-legislativa/comissoes/comissoes-permanentes/ce/arquivos/eventos-2024/20-06-2024-apresentacao-monica-vargas-14h. ' + ACESSO, False)],
 ]
 for runs in REFS:

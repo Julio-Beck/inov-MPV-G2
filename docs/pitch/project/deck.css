@@ -207,3 +207,21 @@ p { margin: 0; font-size: 30px; }
 .in { animation: rise 600ms ease-out both; }
 .in2 { animation: rise 600ms ease-out 150ms both; }
 .in3 { animation: rise 600ms ease-out 300ms both; }
+
+/* valor para a faculdade */
+.cols4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; }
+.cols4 .card { padding: 32px; }
+.cols4 .card .num { font-size: 96px; }
+.cols4 .card .txt { font-size: 26px; color: var(--soft); }
+/* preço */
+.pricing { display: grid; grid-template-columns: 1fr 560px; gap: 72px; align-items: center; }
+.pbars { display: flex; flex-direction: column; gap: 22px; }
+.prow { display: grid; grid-template-columns: 340px 1fr 150px; gap: 20px; align-items: center; }
+.prow .pl { font-size: 24px; color: var(--soft); line-height: 1.2; }
+.ptrack { height: 44px; display: flex; align-items: center; }
+.pbar { height: 44px; border-radius: 6px; background: #C9C3B4; }
+.prow .pv { font-size: 30px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.prow.us .pl, .prow.us .pv { color: var(--green); font-weight: 600; }
+.prow.us .pbar { background: var(--green); }
+.prow.muted .pbar { background: repeating-linear-gradient(45deg, #DDD7C9 0 8px, #EEE9DD 8px 16px); }
+.prow.muted .pl, .prow.muted .pv { color: #8A948E; }

@@ -21,7 +21,7 @@ for line in fill:
     m = re.match(r'\s*(\d+)\s+(\d+)%', line)
     if not m: continue
     pg, pct = int(m.group(1)) - 1, int(m.group(2))
-    if pct < 15 and secs and secs[0][0] < pg < new.get('REF', 999) and not any(p == pg for p, _ in secs):
+    if pct < 30 and secs and secs[0][0] < pg < new.get('REF', 999) and not any(p == pg for p, _ in secs):
         compact.add(max(s for p, s in secs if p <= pg))
 new['compact'] = sorted(compact)
 json.dump(new, open(f'{d}/pg.json', 'w'))
