@@ -13,7 +13,7 @@ from docx.oxml.ns import qn
 SRC, OUT = sys.argv[1], sys.argv[2]
 PAGES = json.load(open(sys.argv[3])) if len(sys.argv) > 3 and sys.argv[3] else {}
 FONT = sys.argv[5] if len(sys.argv) > 5 else 'Times New Roman'
-AUTORES = ['DOUGLAS', 'JÉSSICA', 'JÚLIO', 'THALES']
+AUTORES = ['DOUGLAS GABRIEL DE OLIVEIRA', 'JÉSSICA RABUSKE CASSOL DE DAVID', 'JULIO CESAR BECK E SILVA', 'THALES ALVIN']
 INST = 'ANTONIO MENEGHETTI FACULDADE'
 CURSO = 'CURSO DE SISTEMAS DE INFORMAÇÃO'
 CIDADE, ANO = 'RESTINGA SÊCA', '2026'
