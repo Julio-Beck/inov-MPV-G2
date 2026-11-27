@@ -12,7 +12,7 @@ from docx.oxml.ns import qn
 
 SRC, OUT = sys.argv[1], sys.argv[2]
 PAGES = json.load(open(sys.argv[3])) if len(sys.argv) > 3 and sys.argv[3] else {}
-FONT = 'Arial'
+FONT = sys.argv[5] if len(sys.argv) > 5 else 'Times New Roman'
 AUTORES = ['DOUGLAS', 'JÉSSICA', 'JÚLIO', 'THALES']
 INST = 'ANTONIO MENEGHETTI FACULDADE'
 CURSO = 'CURSO DE SISTEMAS DE INFORMAÇÃO'
@@ -137,7 +137,7 @@ CAP = {  # índice da tabela no original -> (tipo, título, frase de chamada, fo
     7: ('Quadro', 'Composto de marketing (4 Ps)', 'O Quadro {n} apresenta a estratégia para cada um dos 4 Ps.', 'Elaborado pelos autores (2026).'),
     8: ('Tabela', 'Metas comerciais de 2027 a 2029', 'A Tabela {n} apresenta as metas comerciais.', 'Elaborado pelos autores (2026).'),
     9: ('Quadro', 'Tecnologia e segurança', 'O Quadro {n} resume as decisões de tecnologia e segurança.', 'Elaborado pelos autores (2026), com base em Brasil (2018).'),
-    10: ('Quadro', 'Capacidade e equipe de 2027 a 2029', 'O Quadro {n} apresenta a evolução da equipe.', 'Elaborado pelos autores (2026).'),
+    10: ('Quadro', 'Capacidade e equipe de 2027 a 2029', 'O Quadro {n} apresenta a evolução da equipe. A premissa de capacidade é que uma pessoa de sucesso do cliente atende até 20 faculdades, hipótese a medir no piloto.', 'Elaborado pelos autores (2026).'),
     11: ('Tabela', 'Demonstração do resultado projetada de 2027 a 2029 (R$ mil)', 'A Tabela {n} apresenta a demonstração do resultado projetada.', 'Elaborado pelos autores (2026).'),
     12: ('Tabela', 'Uso do investimento de R$ 600 mil', 'A Tabela {n} apresenta o uso do investimento necessário.', 'Elaborado pelos autores (2026).'),
     13: ('Quadro', 'Indicadores financeiros estimados (hipóteses)', 'O Quadro {n} apresenta os indicadores financeiros estimados.', 'Elaborado pelos autores (2026).'),
@@ -148,19 +148,29 @@ CAP = {  # índice da tabela no original -> (tipo, título, frase de chamada, fo
 # parágrafos-rótulo do original que viram título de quadro/tabela (são descartados)
 LABELS = ('Papéis na sociedade', 'Clientes:', 'Tamanho de mercado', 'Concorrentes:', 'Os 4 Ps:', 'Metas comerciais:',
           'Tecnologia e segurança:', 'Capacidade e equipe:', 'DRE projetado', 'Investimento necessário: R$ 600 mil',
-          'Indicadores (hipóteses):', 'Riscos principais:', 'Investimento do piloto', 'Roadmap 2027–2029:', 'roadmap 2027–2029 ·')
+          'Premissa de capacidade:', 'Indicadores (hipóteses):', 'Riscos principais:', 'Investimento do piloto', 'Roadmap 2027–2029:', 'roadmap 2027–2029 ·')
 counters = {'Quadro': 0, 'Tabela': 0, 'Figura': 0}
 captions = []  # (tipo, n, título)
+
+LAST = {'p': None}
+CUR = {'sec': 0}
+COMPACT = set(PAGES.get('compact', []))  # último parágrafo de texto corrido, se foi o último elemento escrito
 
 def caption_block(kind, title, call, fonte):
     counters[kind] += 1; n = counters[kind]
     captions.append((kind, n, title))
-    para(call.format(n=n), keep=True)
-    para(f'{kind} {n} – {title}', size=10, align=WD_ALIGN_PARAGRAPH.LEFT, indent=False, spacing=1.0, before=12, after=3, keep=True)
+    if LAST['p'] is not None:  # a chamada entra no fim do parágrafo anterior (economiza linhas)
+        r = LAST['p'].add_run(' ' + call.format(n=n)); set_font(r, 12, False)
+        LAST['p'].paragraph_format.keep_with_next = True
+    else:
+        para(call.format(n=n), keep=True)
+    LAST['p'] = None
+    para(f'{kind} {n} – {title}', size=10, align=WD_ALIGN_PARAGRAPH.LEFT, indent=False, spacing=1.0, before=4 if CUR['sec'] in COMPACT else 8, after=3, keep=True)
     return n
 
 def fonte_line(text):
-    para(f'Fonte: {text}', size=10, align=WD_ALIGN_PARAGRAPH.LEFT, indent=False, spacing=1.0, before=3, after=12)
+    para(f'Fonte: {text}', size=10, align=WD_ALIGN_PARAGRAPH.LEFT, indent=False, spacing=1.0, before=3, after=8)
+    LAST['p'] = None
 
 def copy_table(src_tbl, kind):
     rows = len(src_tbl.rows); cols = len(src_tbl.columns)
@@ -202,6 +212,16 @@ def copy_table(src_tbl, kind):
         if i == 0:
             trPr = t.rows[0]._tr.get_or_add_trPr(); h = OxmlElement('w:tblHeader'); h.set(qn('w:val'), 'true'); trPr.append(h)
     borders(t, kind == 'Quadro')
+    mar = OxmlElement('w:tblCellMar')  # respiro interno das células
+    tb_pad = 10 if CUR['sec'] in COMPACT else 45
+    for side, v in (('top', tb_pad), ('bottom', tb_pad), ('left', 100), ('right', 100)):
+        e = OxmlElement(f'w:{side}'); e.set(qn('w:w'), str(v)); e.set(qn('w:type'), 'dxa'); mar.append(e)
+    t._tbl.tblPr.append(mar)
+    for i, row in enumerate(t.rows):  # linhas não se partem; quadros pequenos ficam inteiros na mesma página
+        trPr = row._tr.get_or_add_trPr(); cs = OxmlElement('w:cantSplit'); cs.set(qn('w:val'), 'true'); trPr.append(cs)
+        if rows <= 12 and i < rows - 1:
+            for c in row.cells:
+                for cp in c.paragraphs: cp.paragraph_format.keep_with_next = True
     return t
 
 # ---------- CAPA ----------
@@ -279,6 +299,8 @@ first_text_heading = True
 
 def sec_heading(num, title):
     global first_text_heading
+    LAST['p'] = None
+    CUR['sec'] = num
     p = heading(f'{num} {title.upper()}')
     if first_text_heading:  # a seção nova já começa em página nova
         p.paragraph_format.page_break_before = False; first_text_heading = False
@@ -307,6 +329,7 @@ def flush_items():
         runs[-1] = ((last[:-1] if last.endswith(('.', ';')) else last) + end, runs[-1][1])
         p = para('', indent=False); p.paragraph_format.left_indent = Cm(1.9); p.paragraph_format.first_line_indent = Cm(-0.65)
         add_runs(p, [(f'{letters[k]}) ', False)] + runs)
+        LAST['p'] = None
     items = []
 
 for el in body:
@@ -345,7 +368,7 @@ for el in body:
     if style == 'List Paragraph':
         items.append(runs); continue
     flush_items()
-    q = para(''); add_runs(q, runs)
+    q = para(''); add_runs(q, runs); LAST['p'] = q
 flush_items()
 
 secnum += 1
