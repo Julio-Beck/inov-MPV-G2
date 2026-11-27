@@ -179,6 +179,12 @@ p { margin: 0; font-size: 30px; }
 .funds .sep { border-top: 2px solid #2F5447; margin: 8px 0 4px; }
 .dark .close { color: var(--lime); font-size: 52px; }
 
+/* MVP em três telas */
+.screens .card { padding: 24px; gap: 10px; }
+.screens .card img { width: 100%; height: 391px; object-fit: cover; object-position: top; border-radius: 12px; border: 2px solid var(--line); background: var(--ivory); }
+.screens .card h3 { font-size: 36px; }
+.screens .card .txt { font-size: 26px; color: var(--soft); }
+
 /* apêndice: diferenciais */
 .diffs .card { gap: 14px; }
 .diffs .card .n { font-family: 'Fraunces', Georgia, serif; font-size: 56px; font-weight: 600; color: var(--green); line-height: 1; }
