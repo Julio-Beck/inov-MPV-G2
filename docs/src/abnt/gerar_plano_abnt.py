@@ -142,10 +142,11 @@ CAP = {  # índice da tabela no original -> (tipo, título, frase de chamada, fo
     13: ('Quadro', 'Capacidade e equipe de 2027 a 2029', 'O Quadro {n} apresenta a evolução da equipe. A premissa de capacidade é que uma pessoa de sucesso do cliente atende até 20 faculdades, hipótese a medir no piloto.', 'Elaborado pelos autores (2026).'),
     14: ('Tabela', 'Demonstração do resultado projetada de 2027 a 2029 (R$ mil)', 'A Tabela {n} apresenta a demonstração do resultado projetada.', 'Elaborado pelos autores (2026).'),
     15: ('Tabela', 'Uso do investimento de R$ 600 mil, por etapa (R$ mil)', 'A Tabela {n} mostra onde entra cada real do investimento, em cada etapa.', 'Elaborado pelos autores (2026), com base na Tabela 5 e no Quadro 10.'),
-    16: ('Quadro', 'Indicadores financeiros estimados (hipóteses)', 'O Quadro {n} apresenta os indicadores financeiros estimados.', 'Elaborado pelos autores (2026).'),
-    17: ('Quadro', 'Cenários para o fim de 2029', 'O Quadro {n} compara três cenários.', 'Elaborado pelos autores (2026).'),
-    18: ('Quadro', 'Riscos principais e respostas', 'O Quadro {n} apresenta os riscos principais e as respostas previstas.', 'Elaborado pelos autores (2026).'),
-    19: ('Tabela', 'Investimento do piloto em 2027 (R$ mil)', 'A Tabela {n} detalha o investimento do piloto e o que cada valor paga.', 'Elaborado pelos autores (2026).'),
+    16: ('Tabela', 'Uso da segunda etapa (R$ 500 mil), item por item (R$)', 'A Tabela {n} detalha cada item da segunda etapa.', 'Elaborado pelos autores (2026), com base em Jobrise (2026), Salario.com.br (2026) e Robert Half (2026). Valores sem fonte são estimativas dos autores.'),
+    17: ('Quadro', 'Indicadores financeiros estimados (hipóteses)', 'O Quadro {n} apresenta os indicadores financeiros estimados.', 'Elaborado pelos autores (2026).'),
+    18: ('Quadro', 'Cenários para o fim de 2029', 'O Quadro {n} compara três cenários.', 'Elaborado pelos autores (2026).'),
+    19: ('Quadro', 'Riscos principais e respostas', 'O Quadro {n} apresenta os riscos principais e as respostas previstas.', 'Elaborado pelos autores (2026).'),
+    20: ('Tabela', 'Orçamento do piloto em 2027, item por item (R$)', 'A Tabela {n} detalha o orçamento do piloto: o que é cada gasto, onde e como, e a base de cada valor.', 'Elaborado pelos autores (2026), com base em ANP (2026), ABMES (2026), Tabela... (2026), INPI (2025), Linkedin... (2026), CPM... (2026) e Google (2026). Valores sem fonte são estimativas dos autores.'),
 }
 # parágrafos-rótulo do original que viram título de quadro/tabela (são descartados)
 LABELS = ('Papéis na sociedade', 'Clientes:', 'Tamanho de mercado', 'Concorrentes:', 'Os 4 Ps:', 'Metas comerciais:',
@@ -222,7 +223,8 @@ def copy_table(src_tbl, kind):
     t._tbl.tblPr.append(mar)
     for i, row in enumerate(t.rows):  # linhas não se partem; quadros pequenos ficam inteiros na mesma página
         trPr = row._tr.get_or_add_trPr(); cs = OxmlElement('w:cantSplit'); cs.set(qn('w:val'), 'true'); trPr.append(cs)
-        if rows <= 12:  # inclusive a última linha, que fica presa à linha de fonte
+        src_bold = i > 0 and all(r.bold for c in src_tbl.rows[i].cells[:1] for sp in c.paragraphs for r in sp.runs if r.text.strip())
+        if rows <= 12 or src_bold:  # quadro pequeno inteiro; linha de categoria presa ao primeiro item
             for c in row.cells:
                 for cp in c.paragraphs: cp.paragraph_format.keep_with_next = True
     return t
@@ -383,24 +385,34 @@ for t in ('A Oportuniza Rede se apoia em uma obrigação que já existe: toda fa
 # ---------- REFERÊNCIAS (NBR 6023:2018) ----------
 heading('REFERÊNCIAS', centered=True)
 REFS = [
+    [('AGÊNCIA NACIONAL DO PETRÓLEO, GÁS NATURAL E BIOCOMBUSTÍVEIS (ANP). ', False), ('Síntese semanal do comportamento dos preços dos combustíveis', True), (': semana 45/2026. Rio de Janeiro: ANP, 2026. Disponível em: https://www.gov.br/anp/pt-br/assuntos/precos-e-defesa-da-concorrencia/precos/arq-sintese-semanal/2026/sintese-precos-45.pdf. ' + ACESSO, False)],
     [('ALMEIDA, Daniella. Brasil atinge recorde de 10,6 milhões de matrículas no ensino superior. ', False), ('Agência Brasil', True), (', Brasília, DF, 26 nov. 2026. Disponível em: https://agenciabrasil.ebc.com.br/educacao/noticia/2026-11/brasil-atinge-recorde-de-106-milhoes-de-matriculas-no-ensino-superior. ' + ACESSO, False)],
+    [('ASSOCIAÇÃO BRASILEIRA DE MANTENEDORAS DE ENSINO SUPERIOR (ABMES). ', False), ('28º Fórum Nacional do Ensino Superior Particular Brasileiro (FNESP)', True), ('. Brasília, DF: ABMES, 2026. Disponível em: https://abmes.org.br/eventos/detalhe/1113/28-forum-nacional-do-ensino-superior-particular-brasileiro-fnesp-. ' + ACESSO, False)],
     [('BRASIL. ', False), ('Lei nº 11.788, de 25 de setembro de 2008', True), ('. Dispõe sobre o estágio de estudantes. Brasília, DF: Presidência da República, 2008. Texto atualizado disponível em: https://www2.camara.leg.br/legin/fed/lei/2008/lei-11788-25-setembro-2008-581200-normaatualizada-pl.html. ' + ACESSO, False)],
     [('BRASIL. ', False), ('Lei nº 13.709, de 14 de agosto de 2018', True), ('. Lei Geral de Proteção de Dados Pessoais (LGPD). Brasília, DF: Presidência da República, 2018. Disponível em: https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm. ' + ACESSO, False)],
     [('BRAZILIAN fintech Pravaler buys edtech Workalove and increases solutions for education. ', False), ('LatamFintech', True), (', [S. l.], 3 jun. 2025. Disponível em: https://www.latamfintech.co/articles/brazilian-fintech-pravaler-buys-edtech-workalove-and-increases-solutions-for-education. ' + ACESSO, False)],
     [('CENTRO DE INTEGRAÇÃO EMPRESA-ESCOLA DO PARANÁ (CIEE/PR). ', False), ('Perguntas e respostas', True), (': unidades concedentes. Curitiba: CIEE/PR, [2026]. Disponível em: https://autoweb.cieepr.org.br/AutoWeb/frmPERGUNTARESPOSTA.ASPX?tipo=UC. ' + ACESSO, False)],
     [('CONSELHO FEDERAL DE ENFERMAGEM (COFEN). ', False), ('Termo de julgamento', True), (': Pregão Eletrônico nº 90.001/2026. Brasília, DF: Cofen, 2026. Disponível em: https://www.portalcofen.gov.br/wp-content/uploads/2026/03/Termo-de-Julgamento-Pregao-Eletronico-no-90.001-2026.pdf. ' + ACESSO, False)],
+    [('CPM médio no Facebook Ads Brasil 2026. ', False), ('Trafius', True), (', [S. l.], 2026. Disponível em: https://trafius.com.br/blog/cpm-medio-facebook-ads-brasil-2026. ' + ACESSO, False)],
     [('ENSINO superior: mega mantenedoras concentram 47,1% das matrículas de graduação. ', False), ('PEBSP', True), (', [S. l.], 28 abr. 2026. Disponível em: https://www.pebsp.com/?p=47100. ' + ACESSO, False)],
     [('ESTÁGIO define faculdade para 75% dos estudantes, mostra pesquisa. ', False), ('Educa Mais Brasil', True), (', [S. l.], 2025. Disponível em: https://www.educamaisbrasil.com.br/educacao/noticias/estagio-define-faculdade-para-75-dos-estudantes-mostra-pesquisa. ' + ACESSO, False)],
     [('FUNDAÇÃO DE AMPARO À PESQUISA DO ESTADO DO RIO GRANDE DO SUL (FAPERGS). ', False), ('Programa Centelha RS', True), (': edital da 2ª edição. Porto Alegre: FAPERGS, 2021. Disponível em: https://programacentelha.com.br/wp-content/uploads/2021/09/RS-Edital-Centelha-2-1.pdf. ' + ACESSO, False)],
     [('FUNDAÇÃO DE AMPARO À PESQUISA DO ESTADO DO RIO GRANDE DO SUL (FAPERGS). ', False), ('Edital FAPERGS 07/2025', True), (': Programa Centelha 3 RS. Porto Alegre: FAPERGS, 2025. Disponível em: https://programacentelha.com.br/wp-content/uploads/2025/10/Edital-Centelha-3-RS-31-10-2025.pdf. ' + ACESSO, False)],
+    [('GOOGLE. ', False), ('Google Workspace', True), (': planos para empresas. [S. l.]: Google, 2026. Disponível em: https://workspace.google.com/intl/pt-BR/lp/business. ' + ACESSO, False)],
+    [('INSTITUTO NACIONAL DA PROPRIEDADE INDUSTRIAL (INPI). ', False), ('Tabela de retribuições do INPI', True), (': marcas. Rio de Janeiro: INPI, 2025. Disponível em: https://www.gov.br/inpi/pt-br/servicos/custos-e-pagamento/NovaTabeladeRetribuiesINPI_MARCAS_Final_20_dez_25.pdf. ' + ACESSO, False)],
     [('INSTITUTO NACIONAL DE ESTUDOS E PESQUISAS EDUCACIONAIS ANÍSIO TEIXEIRA (INEP). ', False), ('Brasil tem recorde de estudantes na graduação', True), ('. Brasília, DF: Inep, 26 nov. 2026. Disponível em: https://www.gov.br/inep/pt-br/centrais-de-conteudo/noticias/censo-da-educacao-superior/brasil-tem-recorde-de-estudantes-na-graduacao. ' + ACESSO, False)],
+    [('JOBRISE. ', False), ('Tech sales no Brasil', True), (': vagas de SDR e AE. [S. l.]: Jobrise, 2026. Disponível em: https://jobrise.io/pt/blog/tech-sales-brasil-sdr-ae-vagas/. ' + ACESSO, False)],
+    [('LINKEDIN Ads benchmarks 2026: CPC, CTR, CVR by industry. ', False), ('Digital Applied', True), (', [S. l.], 2026. Disponível em: https://digitalapplied.com/linkedin-ads-benchmarks-2026. ' + ACESSO, False)],
     [('O SINAES e os parâmetros avaliativos do relacionamento com egressos. ', False), ('Sempre UFMG', True), (', Belo Horizonte, [20--]. Disponível em: https://www.ufmg.br/copi/sempreufmg/o-sinaes-e-os-parametros-avaliativos-do-relacionamento-com-egressos/. ' + ACESSO, False)],
     [('OPORTUNIZA REDE. ', False), ('inov-MPV-G2', True), (': MVP da plataforma Oportuniza Rede. [S. l.]: GitHub, 2026. Disponível em: https://github.com/Julio-Beck/inov-MPV-G2. ' + ACESSO, False)],
     [('PEÇANHA, Laryssa. Nube: plataforma de vagas para estágio. Saiba como funciona. ', False), ('B2B Stack', True), (', [S. l.], 11 jan. 2018. Disponível em: https://www.b2bstack.com.br/product/nube. ' + ACESSO, False)],
     [('QUANTO ganha um estagiário? ', False), ('IstoÉ Dinheiro', True), (', São Paulo, 4 maio 2025. Disponível em: https://istoedinheiro.com.br/quanto-ganha-um-estagiario. ' + ACESSO, False)],
     [('RETENÇÃO de estagiários nas empresas [título atribuído]. ', False), ('Economic News Brasil', True), (', [S. l.], 9 fev. 2026. Disponível em: https://economicnewsbrasil.com.br/2026/02/09/retencao-de-estagiarios-empresas/. ' + ACESSO, False)],
+    [('ROBERT HALF. ', False), ('Desenvolvedor back-end júnior', True), (': faixa salarial em Porto Alegre. São Paulo: Robert Half, 2026. Disponível em: https://www.roberthalf.com/br/pt/vagas-detalhes/desenvolvedora-back-end-junior/porto-alegre. ' + ACESSO, False)],
+    [('SALARIO.COM.BR. ', False), ('Analista de sucesso do cliente', True), (': salário em Porto Alegre, RS. [S. l.], 2026. Disponível em: https://www.salario.com.br/profissao/analista-de-sucesso-do-cliente-cbo-142360/porto-alegre-rs/. ' + ACESSO, False)],
     [('SANTA CATARINA. ', False), ('Contrato nº 01/2026', True), (': Centro de Integração Empresa-Escola (CIEE). Florianópolis, 2026. Disponível em: https://simaecao.sc.gov.br/pdfs/cont_012026_ciee_assinado.pdf. ' + ACESSO, False)],
     [('SUPER Estágios atinge R$ 164 milhões e prevê 100 unidades até 2025. ', False), ('Mercado&Consumo', True), (', São Paulo, 10 jan. 2025. Disponível em: https://mercadoeconsumo.com.br/10/01/2025/gestao/super-estagios-atinge-r-164-milhoes-e-preve-100-unidades-ate-2025. ' + ACESSO, False)],
+    [('TABELA de honorários da OAB RS 2026: valores atualizados para advogados. ', False), ('Toexceed', True), (', [S. l.], 2026. Disponível em: https://toexceed.com.br/blog/?p=36313. ' + ACESSO, False)],
     [('TRIBUNAL REGIONAL ELEITORAL DE RONDÔNIA (TRE-RO). ', False), ('Termo aditivo nº 2', True), (': contrato decorrente do Pregão Eletrônico nº 90002/2024 (agente de integração de estágio). Porto Velho: TRE-RO, 2025. Disponível em: https://www.tre-ro.jus.br/transparencia-e-prestacao-de-contas/licitacoes-e-contratos/integra-dos-termos-aditivos/arquivos-1/tre-ro-t-a-02-pe90002-2024-ct16-20224-public-dje-pncp. ' + ACESSO, False)],
     [('VARGAS, Mônica. ', False), ('Cenário da juventude', True), ('. Apresentação em audiência pública da Comissão de Educação da Câmara dos Deputados. Brasília, DF, 20 jun. 2024. Disponível em: https://www2.camara.leg.br/atividade-legislativa/comissoes/comissoes-permanentes/ce/arquivos/eventos-2024/20-06-2024-apresentacao-monica-vargas-14h. ' + ACESSO, False)],
 ]
